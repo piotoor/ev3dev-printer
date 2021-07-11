@@ -6,5 +6,5 @@ if __name__ == '__main__':
     ptr = printer.Printer(2)
     ptr.calibrate()
 
-    # printer.draw("skorpjen.png")
-    ptr.draw()
+    ptr.draw(path="skorpjen.png")
+    # ptr.draw()

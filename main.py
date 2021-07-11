@@ -21,208 +21,206 @@ class Printer:
     colors = ('unknown', 'black', 'blue', 'green', 'yellow', 'red', 'white', 'brown')
 
     def __init__(self, pixel_size):
-        self.touch = TouchSensor(INPUT_1)
-        self.color = ColorSensor(INPUT_2)
-        self.color.mode = 'COL-COLOR'
-        self.fb_motor = LargeMotor(OUTPUT_C)
-        self.lr_motor = LargeMotor(OUTPUT_B)
-        self.ud_motor = Motor(OUTPUT_A)
+        self._touch = TouchSensor(INPUT_1)
+        self._color = ColorSensor(INPUT_2)
+        self._color.mode = 'COL-COLOR'
+        self._fb_motor = LargeMotor(OUTPUT_C)
+        self._lr_motor = LargeMotor(OUTPUT_B)
+        self._ud_motor = Motor(OUTPUT_A)
 
-        self.x_res = 320 / pixel_size
-        self.y_res = 360 / pixel_size
-        self.is_pen_up = True
-        self.pen_calibrated = False
+        self._x_res = 320 / pixel_size
+        self._y_res = 360 / pixel_size
+        self._is_pen_up = True
+        self._pen_calibrated = False
 
-        self.ud_ratio = 5
-        self.fb_ratio = 5
-        self.lr_ratio = 1
-        self.pen_up_val = -3 * self.ud_ratio
-        self.pen_down_val = -self.pen_up_val
-        self.pen_up_down_speed = 10
-        self.pen_left_speed = 20
-        self.pen_right_speed = 10
-        self.paper_scroll_speed = 10
+        self._ud_ratio = 5
+        self._fb_ratio = 5
+        self._lr_ratio = 1
+        self._pen_up_val = -3 * self._ud_ratio
+        self._pen_down_val = -self._pen_up_val
+        self._pen_up_down_speed = 10
+        self._pen_left_speed = 20
+        self._pen_right_speed = 10
+        self._paper_scroll_speed = 10
 
-        self.pixel_size = pixel_size
-        self.p_codes = []
-        self.binarized = []
+        self._pixel_size = pixel_size
+        self._p_codes = []
+        self._binarized = []
 
-    def read_image_from_file(self, path):
-        img = Image.open(path).convert('1').resize((self.x_res, self.y_res))
+    def _read_image_from_file(self, path):
+        img = Image.open(path).convert('1').resize((self._x_res, self._y_res))
         pixels = list(img.getdata())
-        self.binarized = list(map(lambda val: not val, pixels))
+        self._binarized = list(map(lambda val: not val, pixels))
 
-    def generate_test_image(self):
-        no_of_alternating_horizontal_strips = int(self.y_res // 4)
-        no_of_chessboard_rows = int(self.y_res // 2)
-        cols = int(self.x_res)
+    def _generate_test_image(self):
+        no_of_alternating_horizontal_strips = int(self._y_res // 4)
+        no_of_chessboard_rows = int(self._y_res // 2)
+        cols = int(self._x_res)
 
         for i in range(0, no_of_chessboard_rows):
             white_square = i % 2 == 0
             for col in range(0, cols):
-                self.binarized.append(white_square)
+                self._binarized.append(white_square)
                 white_square = not white_square
 
         for i in range(0, no_of_alternating_horizontal_strips):
             for col in range(0, cols):
-                self.binarized.append(True)
+                self._binarized.append(True)
             for col in range(0, cols):
-                self.binarized.append(False)
+                self._binarized.append(False)
 
-    def image_to_p_codes(self):
-        rows = int(self.y_res)
-        cols = int(self.x_res)
+    def _image_to_p_codes(self):
+        rows = int(self._y_res)
+        cols = int(self._x_res)
 
         for i in range(rows):
-            prev = self.binarized[i * cols]
+            prev = self._binarized[i * cols]
 
             if prev:
-                self.p_codes.append([self.Command.PEN_DOWN, 0])
-            self.p_codes.append([self.Command.RIGHT, 0])
+                self._p_codes.append([self.Command.PEN_DOWN, 0])
+            self._p_codes.append([self.Command.RIGHT, 0])
 
             for j in range(1, cols):
-                curr = self.binarized[i * cols + j]
+                curr = self._binarized[i * cols + j]
                 if curr == prev:
-                    self.p_codes[-1][1] += 1
+                    self._p_codes[-1][1] += 1
                 else:
                     if curr:
-                        self.p_codes.append([self.Command.PEN_DOWN, 0])
-                        self.p_codes.append([self.Command.RIGHT, 0])
+                        self._p_codes.append([self.Command.PEN_DOWN, 0])
+                        self._p_codes.append([self.Command.RIGHT, 0])
                     else:
-                        self.p_codes.append([self.Command.PEN_UP, 0])
-                        self.p_codes.append([self.Command.RIGHT, 2])
+                        self._p_codes.append([self.Command.PEN_UP, 0])
+                        self._p_codes.append([self.Command.RIGHT, 2])
 
                 prev = curr
 
-            self.p_codes.append([self.Command.PEN_UP, 0])
-            self.p_codes.append([self.Command.LEFT, self.x_res])
-            self.p_codes.append([self.Command.SCROLL, 1])
+            self._p_codes.append([self.Command.PEN_UP, 0])
+            self._p_codes.append([self.Command.LEFT, self._x_res])
+            self._p_codes.append([self.Command.SCROLL, 1])
 
-    def pen_up(self, val):
+    def _pen_up(self, val):
         print("{} {}".format('PEN_UP', val))
-        self.ud_motor.on_for_degrees(self.pen_up_down_speed, val)
-        self.is_pen_up = True
+        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val)
+        self._is_pen_up = True
 
-    def pen_down(self, val):
+    def _pen_down(self, val):
         print("{} {}".format('PEN_DOWN', val))
-        self.ud_motor.on_for_degrees(self.pen_up_down_speed, val)
-        self.is_pen_up = False
+        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val)
+        self._is_pen_up = False
 
-    def pen_left(self, val):
+    def _pen_left(self, val):
         print("{} {}".format('LEFT', val))
-        self.lr_motor.on_for_degrees(self.pen_left_speed, self.pixel_size * val * self.lr_ratio)
+        self._lr_motor.on_for_degrees(self._pen_left_speed, self._pixel_size * val * self._lr_ratio)
 
-    def pen_right(self, val):
+    def _pen_right(self, val):
         print("{} {}".format('RIGHT', val))
-        self.lr_motor.on_for_degrees(self.pen_right_speed, -self.pixel_size * val * self.lr_ratio)
+        self._lr_motor.on_for_degrees(self._pen_right_speed, -self._pixel_size * val * self._lr_ratio)
 
-    def paper_scroll(self, val):
+    def _paper_scroll(self, val):
         print("{} {}".format('SCROLL', val))
-        self.fb_motor.on_for_degrees(self.paper_scroll_speed, self.pixel_size * val * self.fb_ratio)
+        self._fb_motor.on_for_degrees(self._paper_scroll_speed, self._pixel_size * val * self._fb_ratio)
 
-    def finish_calibration(self):
-        self.pen_calibrated = True
+    def _finish_calibration(self):
+        self._pen_calibrated = True
 
     def calibrate(self):
         speaker = Sound()
         speaker.speak("Calibrating")
         btn = Button()
 
-        self.lr_motor.reset()
-        self.ud_motor.reset()
-        self.fb_motor.reset()
+        self._lr_motor.reset()
+        self._ud_motor.reset()
+        self._fb_motor.reset()
 
-        self.lr_motor.on_for_degrees(10, 320)
-        self.lr_motor.reset()
+        self._lr_motor.on_for_degrees(10, 320)
+        self._lr_motor.reset()
 
-        self.ud_motor.on(-15)
-        self.touch.wait_for_pressed()
-        self.ud_motor.stop()
+        self._ud_motor.on(-15)
+        self._touch.wait_for_pressed()
+        self._ud_motor.stop()
         time.sleep(1)
-        self.ud_motor.on(15)
-        self.touch.wait_for_released()
-        self.ud_motor.on_for_degrees(10, 40)
-        self.ud_motor.stop()
+        self._ud_motor.on(15)
+        self._touch.wait_for_released()
+        self._ud_motor.on_for_degrees(10, 40)
+        self._ud_motor.stop()
         time.sleep(1)
 
         speaker.speak("Insert calibration paper and press the touch sensor")
-        self.touch.wait_for_pressed()
+        self._touch.wait_for_pressed()
         speaker.speak("Adjust pen height")
 
-        while not self.pen_calibrated:
-            self.lr_motor.on_for_degrees(10, -100)
-            self.lr_motor.on_for_degrees(10, 100)
+        while not self._pen_calibrated:
+            self._lr_motor.on_for_degrees(10, -100)
+            self._lr_motor.on_for_degrees(10, 100)
             time.sleep(1)
             if btn.up:
-                self.pen_up(self.pen_up_val)
+                self._pen_up(self._pen_up_val)
             elif btn.down:
-                self.pen_down(self.pen_down_val * 2)
+                self._pen_down(self._pen_down_val * 2)
             elif btn.right:
-                self.finish_calibration()
+                self._finish_calibration()
             elif btn.left:
-                self.pen_down(self.ud_ratio)
+                self._pen_down(self._ud_ratio)
 
-        self.lr_motor.reset()
-        self.pen_up(self.pen_up_val)
+        self._lr_motor.reset()
+        self._pen_up(self._pen_up_val)
         speaker.speak("Insert a blank piece of paper and press the touch sensor")
-        self.touch.wait_for_pressed()
+        self._touch.wait_for_pressed()
 
-        self.lr_motor.stop()
-        self.lr_motor.on_for_degrees(10, 120)
-        self.lr_motor.reset()
+        self._lr_motor.stop()
+        self._lr_motor.on_for_degrees(10, 120)
+        self._lr_motor.reset()
 
-        self.fb_motor.on(5)
+        self._fb_motor.on(5)
         val = 0
         while self.colors[val] == 'unknown':
-            val = self.color.value()
+            val = self._color.value()
             print("Color = {}".format(self.colors[val]))
 
-        self.fb_motor.reset()
+        self._fb_motor.reset()
 
     def draw(self, path=None):
         speaker = Sound()
         if path is not None:
-            self.read_image_from_file(path)
-            speaker.speak("Printing")
+            self._read_image_from_file(path)
+            speaker.speak("Printing image")
+            print("Printing image")
         else:
-            self.generate_test_image()
+            self._generate_test_image()
             speaker.speak("Printing test page")
+            print("Printing test page")
 
-        self.image_to_p_codes()
+        self._image_to_p_codes()
 
-        print("p_codes:\n")
-        line = 0
-        for x in self.p_codes:
-            print("------- Line number: {} / {} -------".format(line, self.y_res))
-            line += 1
+        print("---------- p_codes:----------\n")
+        for x in self._p_codes:
 
             if x[0] == self.Command.PEN_UP:
-                if not self.is_pen_up:
-                    self.pen_up(self.pen_up_val)
+                if not self._is_pen_up:
+                    self._pen_up(self._pen_up_val)
 
             elif x[0] == self.Command.PEN_DOWN:
-                if self.is_pen_up:
-                    self.pen_down(self.pen_down_val)
+                if self._is_pen_up:
+                    self._pen_down(self._pen_down_val)
 
             elif x[0] == self.Command.RIGHT:
-                self.pen_right(x[1])
+                self._pen_right(x[1])
 
             elif x[0] == self.Command.LEFT:
-                self.pen_left(x[1])
+                self._pen_left(x[1])
 
             elif x[0] == self.Command.SCROLL:
-                self.paper_scroll(x[1])
+                self._paper_scroll(x[1])
 
-            print("lr_motor.pos: {}".format(self.lr_motor.position))
-
-        self.ud_motor.on_for_degrees(10, self.pen_up_val)
-        self.ud_motor.stop()
-        self.fb_motor.on_for_degrees(10, -360)
-        self.fb_motor.stop()
-        self.fb_motor.reset()
+        self._ud_motor.on_for_degrees(10, self._pen_up_val)
+        self._ud_motor.stop()
+        self._fb_motor.on_for_degrees(10, -360)
+        self._fb_motor.stop()
+        self._fb_motor.reset()
 
         speaker = Sound()
         speaker.speak("Printing finished")
+        print("Printing finished")
 
 
 if __name__ == '__main__':

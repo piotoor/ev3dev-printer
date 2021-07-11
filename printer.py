@@ -8,15 +8,52 @@ from enum import Enum
 import time
 from ev3dev2.sound import Sound
 
+MAX_X_RES = 320
+MAX_Y_RES = 360
+
+
+class Command(Enum):
+    PEN_UP = 0
+    PEN_DOWN = 1
+    RIGHT = 2
+    LEFT = 3
+    SCROLL = 4
+
+
+def binarized_image_to_p_codes(binarized, x_res, y_res):
+    p_codes = []
+    rows = int(y_res)
+    cols = int(x_res)
+
+    for i in range(rows):
+        prev = binarized[i * cols]
+
+        if prev:
+            p_codes.append([Command.PEN_DOWN, 0])
+        p_codes.append([Command.RIGHT, 0])
+
+        for j in range(1, cols):
+            curr = binarized[i * cols + j]
+            if curr == prev:
+                p_codes[-1][1] += 1
+            else:
+                if curr:
+                    p_codes.append([Command.PEN_DOWN, 0])
+                    p_codes.append([Command.RIGHT, 0])
+                else:
+                    p_codes.append([Command.PEN_UP, 0])
+                    p_codes.append([Command.RIGHT, 2])
+
+            prev = curr
+
+        p_codes.append([Command.PEN_UP, 0])
+        p_codes.append([Command.LEFT, x_res])
+        p_codes.append([Command.SCROLL, 1])
+
+    return p_codes
+
 
 class Printer:
-    class Command(Enum):
-        PEN_UP = 0
-        PEN_DOWN = 1
-        RIGHT = 2
-        LEFT = 3
-        SCROLL = 4
-
     colors = ('unknown', 'black', 'blue', 'green', 'yellow', 'red', 'white', 'brown')
 
     def __init__(self, pixel_size):
@@ -27,8 +64,8 @@ class Printer:
         self._lr_motor = LargeMotor(OUTPUT_B)
         self._ud_motor = Motor(OUTPUT_A)
 
-        self._x_res = 320 / pixel_size
-        self._y_res = 360 / pixel_size
+        self._x_res = MAX_X_RES / pixel_size
+        self._y_res = MAX_Y_RES / pixel_size
         self._is_pen_up = True
         self._pen_calibrated = False
 
@@ -67,35 +104,6 @@ class Printer:
                 self._binarized.append(True)
             for col in range(0, cols):
                 self._binarized.append(False)
-
-    def _image_to_p_codes(self):
-        rows = int(self._y_res)
-        cols = int(self._x_res)
-
-        for i in range(rows):
-            prev = self._binarized[i * cols]
-
-            if prev:
-                self._p_codes.append([self.Command.PEN_DOWN, 0])
-            self._p_codes.append([self.Command.RIGHT, 0])
-
-            for j in range(1, cols):
-                curr = self._binarized[i * cols + j]
-                if curr == prev:
-                    self._p_codes[-1][1] += 1
-                else:
-                    if curr:
-                        self._p_codes.append([self.Command.PEN_DOWN, 0])
-                        self._p_codes.append([self.Command.RIGHT, 0])
-                    else:
-                        self._p_codes.append([self.Command.PEN_UP, 0])
-                        self._p_codes.append([self.Command.RIGHT, 2])
-
-                prev = curr
-
-            self._p_codes.append([self.Command.PEN_UP, 0])
-            self._p_codes.append([self.Command.LEFT, self._x_res])
-            self._p_codes.append([self.Command.SCROLL, 1])
 
     def _pen_up(self, val):
         print("{} {}".format('PEN_UP', val))
@@ -189,10 +197,10 @@ class Printer:
             speaker.speak("Printing test page")
             print("Printing test page")
 
-        self._image_to_p_codes()
+        p_codes = binarized_image_to_p_codes(self._binarized, self._x_res, self._y_res)
 
         print("---------- p_codes:----------\n")
-        for x in self._p_codes:
+        for x in p_codes:
 
             if x[0] == self.Command.PEN_UP:
                 if not self._is_pen_up:

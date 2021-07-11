@@ -69,8 +69,6 @@ class Printer:
             for col in range(0, cols):
                 self.binarized.append(False)
 
-
-
     def image_to_p_codes(self):
         rows = int(self.y_res)
         cols = int(self.x_res)
@@ -164,7 +162,6 @@ class Printer:
             elif btn.left:
                 self.pen_down(self.ud_ratio)
 
-
         self.lr_motor.reset()
         self.pen_up(self.pen_up_val)
         speaker.speak("Insert a blank piece of paper and press the touch sensor")
@@ -232,5 +229,5 @@ if __name__ == '__main__':
     printer = Printer(2)
     printer.calibrate()
 
-    #printer.draw("skorpjen.png")
+    # printer.draw("skorpjen.png")
     printer.draw()

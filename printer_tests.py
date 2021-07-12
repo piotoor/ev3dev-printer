@@ -359,3 +359,25 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
         for images, expected in zip(binarized_testcases, expected_p_codes):
             p_codes = printer.binarized_image_to_p_codes(images, x_res, y_res)
             self.assertEqual(p_codes, expected)
+
+    def test_10x10_alternating_rows(self):
+        x_res = 10
+        y_res = 10
+
+        binarized = [
+            (x // 10) % 2 == 0 for x in range(x_res * y_res)
+        ]
+
+        expected_p_codes = [
+                [printer.Command.PEN_DOWN, 0],
+                [printer.Command.PEN_RIGHT, x_res - 1],
+                [printer.Command.PEN_UP, 0],
+                [printer.Command.PEN_LEFT, x_res - 1],
+                [printer.Command.SCROLL, 1],
+                [printer.Command.PEN_RIGHT, x_res - 1],
+                [printer.Command.PEN_LEFT, x_res - 1],
+                [printer.Command.SCROLL, 1]
+        ] * (x_res // 2)
+
+        p_codes = printer.binarized_image_to_p_codes(binarized, x_res, y_res)
+        self.assertEqual(p_codes, expected_p_codes)

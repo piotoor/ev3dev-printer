@@ -202,21 +202,21 @@ class Printer:
         print("---------- p_codes:----------\n")
         for x in p_codes:
 
-            if x[0] == self.Command.PEN_UP:
+            if x[0] == Command.PEN_UP:
                 if not self._is_pen_up:
                     self._pen_up(self._pen_up_val)
 
-            elif x[0] == self.Command.PEN_DOWN:
+            elif x[0] == Command.PEN_DOWN:
                 if self._is_pen_up:
                     self._pen_down(self._pen_down_val)
 
-            elif x[0] == self.Command.RIGHT:
+            elif x[0] == Command.RIGHT:
                 self._pen_right(x[1])
 
-            elif x[0] == self.Command.LEFT:
+            elif x[0] == Command.LEFT:
                 self._pen_left(x[1])
 
-            elif x[0] == self.Command.SCROLL:
+            elif x[0] == Command.SCROLL:
                 self._paper_scroll(x[1])
 
         self._ud_motor.on_for_degrees(10, self._pen_up_val)

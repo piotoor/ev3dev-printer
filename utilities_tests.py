@@ -407,7 +407,7 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
                 [utilities.Command.PEN_DOWN, 0],
                 [utilities.Command.PEN_RIGHT, 0],
                 [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_RIGHT, 2],
+                [utilities.Command.PEN_RIGHT, 20],
 
                 [utilities.Command.PEN_DOWN, 0],
                 [utilities.Command.PEN_RIGHT, 0],

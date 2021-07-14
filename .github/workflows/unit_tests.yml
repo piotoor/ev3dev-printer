@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       filter:
-        description: 'Testcase filter'     
+        description: 'Testcase filter'
         required: false
 
 jobs:
@@ -35,5 +35,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        chmod u+x unit_tests.py
-        ./unit_tests.py
+        python3 -m unittest unit_tests.py

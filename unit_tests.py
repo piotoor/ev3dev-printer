@@ -10,7 +10,12 @@ def main():
     suite.addTest(loader.loadTestsFromModule(utilities_tests))
 
     runner = unittest.TextTestRunner(verbosity=3)
-    runner.run(suite)
+    result = runner.run(suite)
+
+    if result.wasSuccessful():
+        exit(0)
+    else:
+        exit(1)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       filter:
-        description: 'Testcase filter'     
+        description: 'Testcase filter'
         required: false
 
 jobs:

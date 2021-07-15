@@ -3,7 +3,6 @@ from ev3dev2.sensor import INPUT_1, INPUT_2
 from ev3dev2.sensor.lego import TouchSensor
 from ev3dev2.sensor.lego import ColorSensor
 from ev3dev2.button import Button
-from PIL import Image
 import time
 from ev3dev2.sound import Sound
 import utilities
@@ -40,29 +39,26 @@ class Printer:
 
         self._pixel_size = pixel_size
         self._p_codes = []
-        self._binarized = []
-
-    def _read_image_from_file(self, path):
-        img = Image.open(path).convert('1').resize((self._x_res, self._y_res))
-        pixels = list(img.getdata())
-        self._binarized = list(map(lambda val: not val, pixels))
 
     def _generate_test_image(self):
         no_of_alternating_horizontal_strips = int(self._y_res // 4)
         no_of_chessboard_rows = int(self._y_res // 2)
         cols = int(self._x_res)
+        binarized = []
 
         for i in range(0, no_of_chessboard_rows):
             white_square = i % 2 == 0
             for col in range(0, cols):
-                self._binarized.append(white_square)
+                binarized.append(white_square)
                 white_square = not white_square
 
         for i in range(0, no_of_alternating_horizontal_strips):
             for col in range(0, cols):
-                self._binarized.append(True)
+                binarized.append(True)
             for col in range(0, cols):
-                self._binarized.append(False)
+                binarized.append(False)
+
+        return binarized
 
     def _pen_up(self, val):
         print("{} {}".format('PEN_UP', val))
@@ -147,16 +143,17 @@ class Printer:
 
     def draw(self, path=None):
         speaker = Sound()
+
         if path is not None:
-            self._read_image_from_file(path)
+            binarized = utilities.binarize_image(path, self._x_res, self._y_res)
             speaker.speak("Printing image")
             print("Printing image")
         else:
-            self._generate_test_image()
+            binarized = self._generate_test_image()
             speaker.speak("Printing test page")
             print("Printing test page")
 
-        p_codes = utilities.binarized_image_to_p_codes(self._binarized, self._x_res, self._y_res)
+        p_codes = utilities.binarized_image_to_p_codes(binarized, self._x_res, self._y_res)
 
         print("---------- p_codes:----------\n")
         for x in p_codes:

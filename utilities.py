@@ -49,13 +49,9 @@ def binarized_image_to_p_codes(binarized, x_res, y_res):
 
 def binarize_image(path, x_res, y_res):
     img = Image.open(path).convert('1')
-    delta_x = x_res - img.width
-    delta_y = y_res - img.height
 
-    if delta_x > delta_y:
-        img = img.resize((x_res, img.height * x_res // img.width))
-    else:
-        img = img.resize((img.width * x_res // img.height, y_res))
+    ratio = min(x_res / img.width, y_res / img.height)
+    img = img.resize((int(img.width * ratio), int(img.height * ratio)))
 
     pixels = list(img.getdata())
     return list(map(lambda val: not val, pixels))

@@ -433,3 +433,13 @@ class BinarizeImageTests(unittest.TestCase):
         ]
         self.assertEqual(binarized, expected_binarized)
 
+    def test_horizontal_stripes_10x10_to_15x10_image(self):
+        printer_x_res = 15
+        printer_y_res = 10
+
+        binarized = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
+        expected_binarized = [
+            (x // 10) % 2 == 0 for x in range(100)
+        ]
+
+        self.assertEqual(binarized, expected_binarized)

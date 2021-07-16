@@ -420,3 +420,16 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
 
         p_codes = utilities.binarized_image_to_p_codes(binarized, x_res, y_res)
         self.assertEqual(p_codes, expected_p_codes)
+
+
+class BinarizeImageTests(unittest.TestCase):
+    def test_horizontal_stripes_10x10_to_10x10_image(self):
+        printer_x_res = 10
+        printer_y_res = 10
+
+        binarized = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
+        expected_binarized = [
+            (x // 10) % 2 == 0 for x in range(100)
+        ]
+        self.assertEqual(binarized, expected_binarized)
+

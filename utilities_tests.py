@@ -443,3 +443,20 @@ class BinarizeImageTests(unittest.TestCase):
         ]
 
         self.assertEqual(binarized, expected_binarized)
+
+    def test_horizontal_stripes_10x10_to_8x7_image(self):
+        printer_x_res = 8
+        printer_y_res = 7
+
+        binarized = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
+        expected_binarized = [
+            True, True, True, True, True, True, True,
+            True, True, True, True, True, True, True,
+            False, False, False, False, False, False, False,
+            False, False, False, False, False, False, False,
+            True, True, True, True, True, True, True,
+            False, False, False, False, False, False, False,
+            False, False, False, False, False, False, False
+        ]
+
+        self.assertEqual(binarized, expected_binarized)

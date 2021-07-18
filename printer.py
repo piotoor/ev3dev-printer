@@ -7,9 +7,6 @@ import time
 from ev3dev2.sound import Sound
 import utilities
 
-MAX_X_RES = 320
-MAX_Y_RES = 360
-
 
 class Printer:
     colors = ('unknown', 'black', 'blue', 'green', 'yellow', 'red', 'white', 'brown')
@@ -22,8 +19,8 @@ class Printer:
         self._lr_motor = LargeMotor(OUTPUT_B)
         self._ud_motor = Motor(OUTPUT_A)
 
-        self._x_res = MAX_X_RES / pixel_size
-        self._y_res = MAX_Y_RES / pixel_size
+        self._x_res = utilities.MAX_X_RES / pixel_size
+        self._y_res = utilities.MAX_Y_RES / pixel_size
         self._is_pen_up = True
         self._pen_calibrated = False
 
@@ -39,26 +36,6 @@ class Printer:
 
         self._pixel_size = pixel_size
         self._p_codes = []
-
-    def _generate_test_image(self):
-        no_of_alternating_horizontal_strips = int(self._y_res // 4)
-        no_of_chessboard_rows = int(self._y_res // 2)
-        cols = int(self._x_res)
-        binarized = []
-
-        for i in range(0, no_of_chessboard_rows):
-            white_square = i % 2 == 0
-            for col in range(0, cols):
-                binarized.append(white_square)
-                white_square = not white_square
-
-        for i in range(0, no_of_alternating_horizontal_strips):
-            for col in range(0, cols):
-                binarized.append(True)
-            for col in range(0, cols):
-                binarized.append(False)
-
-        return binarized
 
     def _pen_up(self, val):
         print("{} {}".format('PEN_UP', val))
@@ -149,7 +126,7 @@ class Printer:
             speaker.speak("Printing image")
             print("Printing image")
         else:
-            binarized = self._generate_test_image()
+            binarized = utilities.generate_and_binarize_test_image(self._pixel_size)
             speaker.speak("Printing test page")
             print("Printing test page")
 

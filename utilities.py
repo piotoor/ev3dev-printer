@@ -1,6 +1,9 @@
 from enum import Enum
 from PIL import Image
 
+MAX_X_RES = 320
+MAX_Y_RES = 360
+
 
 class Command(Enum):
     PEN_UP = 0
@@ -55,3 +58,32 @@ def binarize_image(path, x_res, y_res):
 
     pixels = list(img.getdata())
     return list(map(lambda val: not val, pixels))
+
+
+def generate_and_binarize_test_image(pixel_size):
+    x_res = MAX_X_RES // pixel_size
+
+    binarized = ([1 for _ in range(x_res * 2)] + [0 for _ in range(x_res * 2)]) * 10  # 40 rows
+
+    t = [[1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1],
+         [1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
+         [0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1]]
+
+    for i in range(2):  # 22 rows
+        for x in t:
+            binarized.extend(([0, 0] + x + [0, 0]) * (8 // pixel_size))
+
+        binarized.extend([0] * x_res)
+
+    for j in range(14):  # 28 rows
+        binarized.extend([1 if (i % 2 == 0) else 0 for i in range(x_res)])
+        binarized.extend([0 if (i % 2 == 0) else 1 for i in range(x_res)])
+
+    return list(map(bool, binarized))

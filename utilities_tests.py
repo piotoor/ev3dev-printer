@@ -10,9 +10,9 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
         binarized = [True]
         p_codes = utilities.binarized_image_to_p_codes(binarized, x_res, y_res)
         expected_p_codes = [
-            [utilities.Command.PEN_DOWN, 0],
+            [utilities.Command.PEN_DOWN, 1],
             [utilities.Command.PEN_RIGHT, 0],
-            [utilities.Command.PEN_UP, 0],
+            [utilities.Command.PEN_UP, 1],
             [utilities.Command.PEN_LEFT, x_res - 1],
             [utilities.Command.SCROLL, 1]
         ]
@@ -40,17 +40,17 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
 
         expected_p_codes = [
             [
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1]
             ],
 
             [
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1]
@@ -58,9 +58,9 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
 
             [
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1]
             ],
@@ -147,9 +147,9 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
                 [utilities.Command.SCROLL, 1],
 
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
             ],
@@ -159,9 +159,9 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
 
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
@@ -172,78 +172,18 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
 
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-            ],
-            # ------------------------------------------------------------
-            [
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-            ],
-
-            [
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-            ],
-
-            [
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-            ],
-
-            [
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
             ],
             # ------------------------------------------------------------
             [
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
                 [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
 
@@ -253,104 +193,164 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
             ],
 
             [
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
                 [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
 
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-            ],
-
-            [
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
             ],
 
             [
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
                 [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
 
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+            ],
+
+            [
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
             ],
             # ------------------------------------------------------------
             [
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-            ],
-
-            [
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_RIGHT, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
             ],
 
             [
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1],
-                [utilities.Command.SCROLL, 1],
-
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+            ],
+
+            [
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
             ],
 
             [
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
 
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 1],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+            ],
+            # ------------------------------------------------------------
+            [
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+            ],
+
+            [
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+            ],
+
+            [
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+            ],
+
+            [
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_LEFT, x_res - 1],
+                [utilities.Command.SCROLL, 1],
+
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 1],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
             ]
@@ -369,9 +369,9 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
         ]
 
         expected_p_codes = [
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, x_res - 1],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_LEFT, x_res - 1],
                 [utilities.Command.SCROLL, 1],
                 [utilities.Command.PEN_RIGHT, x_res - 1],
@@ -391,27 +391,27 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
         ]
 
         expected_p_codes = [
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 2],
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_RIGHT, 2],
-
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
-                [utilities.Command.PEN_RIGHT, 2],
-                [utilities.Command.PEN_DOWN, 0],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 2],
 
-                [utilities.Command.PEN_DOWN, 0],
+                [utilities.Command.PEN_DOWN, 1],
                 [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_RIGHT, 2],
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
+                [utilities.Command.PEN_RIGHT, 2],
+
+                [utilities.Command.PEN_DOWN, 1],
+                [utilities.Command.PEN_RIGHT, 0],
+                [utilities.Command.PEN_UP, 1],
                 [utilities.Command.PEN_RIGHT, 1],
 
                 [utilities.Command.PEN_LEFT, x_res - 1],

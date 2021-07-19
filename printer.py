@@ -39,12 +39,12 @@ class Printer:
 
     def _pen_up(self, val):
         print("{} {}".format('PEN_UP', val))
-        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val)
+        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val * self._pen_up_val)
         self._is_pen_up = True
 
     def _pen_down(self, val):
         print("{} {}".format('PEN_DOWN', val))
-        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val)
+        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val * self._pen_down_val)
         self._is_pen_up = False
 
     def _pen_left(self, val):
@@ -137,11 +137,11 @@ class Printer:
 
             if x[0] == utilities.Command.PEN_UP:
                 if not self._is_pen_up:
-                    self._pen_up(self._pen_up_val)
+                    self._pen_up(x[1])
 
             elif x[0] == utilities.Command.PEN_DOWN:
                 if self._is_pen_up:
-                    self._pen_down(self._pen_down_val)
+                    self._pen_down(x[1])
 
             elif x[0] == utilities.Command.PEN_RIGHT:
                 self._pen_right(x[1])

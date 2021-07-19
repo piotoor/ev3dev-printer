@@ -48,11 +48,11 @@ class Printer:
         self._is_pen_up = False
 
     def _pen_left(self, val):
-        print("{} {}".format('LEFT', val))
+        print("{} {}".format('PEN_LEFT', val))
         self._lr_motor.on_for_degrees(self._pen_left_speed, int(self._pixel_size) * val * self._lr_ratio)
 
     def _pen_right(self, val):
-        print("{} {}".format('RIGHT', val))
+        print("{} {}".format('PEN_RIGHT', val))
         self._lr_motor.on_for_degrees(self._pen_right_speed, -int(self._pixel_size) * val * self._lr_ratio)
 
     def _paper_scroll(self, val):

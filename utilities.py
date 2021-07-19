@@ -1,5 +1,6 @@
 from enum import Enum
 from PIL import Image
+from enum import IntEnum
 
 MAX_X_RES = 320
 MAX_Y_RES = 360
@@ -11,6 +12,12 @@ class Command(Enum):
     PEN_RIGHT = 2
     PEN_LEFT = 3
     SCROLL = 4
+
+
+class PixelSize(IntEnum):
+    PIXEL_1x1 = 1
+    PIXEL_2x2 = 2
+    PIXEL_4x4 = 4
 
 
 def binarized_image_to_p_codes(binarized, x_res, y_res):
@@ -61,7 +68,7 @@ def binarize_image(path, x_res, y_res):
 
 
 def generate_and_binarize_test_image(pixel_size):
-    x_res = MAX_X_RES // pixel_size
+    x_res = MAX_X_RES // int(pixel_size)
 
     binarized = ([1 for _ in range(x_res * 2)] + [0 for _ in range(x_res * 2)]) * 10  # 40 rows
 
@@ -78,7 +85,7 @@ def generate_and_binarize_test_image(pixel_size):
 
     for i in range(2):  # 22 rows
         for x in t:
-            binarized.extend(([0, 0] + x + [0, 0]) * (8 // pixel_size))
+            binarized.extend(([0, 0] + x + [0, 0]) * (8 // int(pixel_size)))
 
         binarized.extend([0] * x_res)
 

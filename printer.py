@@ -19,8 +19,8 @@ class Printer:
         self._lr_motor = LargeMotor(OUTPUT_B)
         self._ud_motor = Motor(OUTPUT_A)
 
-        self._x_res = utilities.MAX_X_RES / pixel_size
-        self._y_res = utilities.MAX_Y_RES / pixel_size
+        self._x_res = utilities.MAX_X_RES / int(pixel_size)
+        self._y_res = utilities.MAX_Y_RES / int(pixel_size)
         self._is_pen_up = True
         self._pen_calibrated = False
 
@@ -49,15 +49,15 @@ class Printer:
 
     def _pen_left(self, val):
         print("{} {}".format('LEFT', val))
-        self._lr_motor.on_for_degrees(self._pen_left_speed, self._pixel_size * val * self._lr_ratio)
+        self._lr_motor.on_for_degrees(self._pen_left_speed, int(self._pixel_size) * val * self._lr_ratio)
 
     def _pen_right(self, val):
         print("{} {}".format('RIGHT', val))
-        self._lr_motor.on_for_degrees(self._pen_right_speed, -self._pixel_size * val * self._lr_ratio)
+        self._lr_motor.on_for_degrees(self._pen_right_speed, -int(self._pixel_size) * val * self._lr_ratio)
 
     def _paper_scroll(self, val):
         print("{} {}".format('SCROLL', val))
-        self._fb_motor.on_for_degrees(self._paper_scroll_speed, self._pixel_size * val * self._fb_ratio)
+        self._fb_motor.on_for_degrees(self._paper_scroll_speed, int(self._pixel_size) * val * self._fb_ratio)
 
     def _finish_calibration(self):
         self._pen_calibrated = True

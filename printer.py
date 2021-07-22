@@ -30,12 +30,13 @@ class Printer:
         self._pen_up_val = -3 * self._ud_ratio
         self._pen_down_val = -self._pen_up_val
         self._pen_up_down_speed = 10
-        self._pen_left_speed = 20
+        self._pen_left_speed = 15
         self._pen_right_speed = 10
-        self._paper_scroll_speed = 10
+        self._paper_scroll_speed = 20
 
         self._pixel_size = pixel_size
         self._p_codes = []
+        self._current_line = 0
 
     def _pen_up(self, val):
         print("{} {}".format('PEN_UP', val))
@@ -57,6 +58,8 @@ class Printer:
 
     def _paper_scroll(self, val):
         print("{} {}".format('SCROLL', val))
+        self._current_line += 1
+        print("-------------- Line {} --------------".format(self._current_line))
         self._fb_motor.on_for_degrees(self._paper_scroll_speed, int(self._pixel_size) * val * self._fb_ratio)
 
     def _finish_calibration(self):
@@ -93,16 +96,16 @@ class Printer:
             self._lr_motor.on_for_degrees(10, 100)
             time.sleep(1)
             if btn.up:
-                self._pen_up(self._pen_up_val)
+                self._pen_up(1)
             elif btn.down:
-                self._pen_down(self._pen_down_val * 2)
+                self._pen_down(1)
             elif btn.right:
                 self._finish_calibration()
             elif btn.left:
-                self._pen_down(self._ud_ratio)
+                self._pen_down(4)
 
         self._lr_motor.reset()
-        self._pen_up(self._pen_up_val)
+        self._pen_up(1)
         speaker.speak("Insert a blank piece of paper and press the touch sensor")
         self._touch.wait_for_pressed()
 
@@ -122,18 +125,24 @@ class Printer:
         speaker = Sound()
 
         if path is not None:
-            binarized = utilities.binarize_image(path, self._x_res, self._y_res)
+            binarized, img_x, img_y = utilities.binarize_image(path, self._x_res, self._y_res)
             speaker.speak("Printing image")
-            print("Printing image")
+            print("\nPrinting image...")
         else:
-            binarized = utilities.generate_and_binarize_test_image(self._pixel_size)
+            binarized, img_x, img_y = utilities.generate_and_binarize_test_image(self._pixel_size)
             speaker.speak("Printing test page")
-            print("Printing test page")
+            print("\nPrinting test page...")
 
-        p_codes = utilities.binarized_image_to_p_codes(binarized, self._x_res, self._y_res)
+        p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y)
+        btn = Button()
 
-        print("---------- p_codes:----------\n")
+        print("---------- p_codes:----------")
+        print("-------------- Line {} --------------".format(self._current_line))
         for x in p_codes:
+            if btn.down:
+                speaker.speak("Aborting")
+                print("\nAborting...")
+                break
 
             if x[0] == utilities.Command.PEN_UP:
                 if not self._is_pen_up:
@@ -152,11 +161,13 @@ class Printer:
             elif x[0] == utilities.Command.SCROLL:
                 self._paper_scroll(x[1])
 
-        self._ud_motor.on_for_degrees(10, self._pen_up_val)
+        self._ud_motor.on_for_degrees(self._pen_up_down_speed, self._pen_up_val)
         self._ud_motor.stop()
-        self._fb_motor.on_for_degrees(10, -360)
-        self._fb_motor.stop()
+        # self._fb_motor.on_for_degrees(10, 360)
+        self._paper_scroll(self._y_res)
         self._fb_motor.reset()
+        self._ud_motor.reset()
+        self._lr_motor.reset()
 
         speaker = Sound()
         speaker.speak("Printing finished")

@@ -61,10 +61,12 @@ def binarize_image(path, x_res, y_res):
     img = Image.open(path).convert('1')
 
     ratio = min(x_res / img.width, y_res / img.height)
-    img = img.resize((int(img.width * ratio), int(img.height * ratio)))
-
+    img_x = int(img.width * ratio)
+    img_y = int(img.height * ratio)
+    print("{} {} x {} resized to {} x {}".format(path, img.width, img.height, img_x, img_y))
+    img = img.resize((img_x, img_y))
     pixels = list(img.getdata())
-    return list(map(lambda val: not val, pixels))
+    return list(map(lambda val: not val, pixels)), img_x, img_y
 
 
 def generate_and_binarize_test_image(pixel_size):
@@ -93,4 +95,4 @@ def generate_and_binarize_test_image(pixel_size):
         binarized.extend([1 if (i % 2 == 0) else 0 for i in range(x_res)])
         binarized.extend([0 if (i % 2 == 0) else 1 for i in range(x_res)])
 
-    return list(map(bool, binarized))
+    return list(map(bool, binarized)), x_res, 90

@@ -427,28 +427,32 @@ class BinarizeImageTests(unittest.TestCase):
         printer_x_res = 10
         printer_y_res = 10
 
-        binarized = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
+        b, x, y = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
         expected_binarized = [
-            (x // 10) % 2 == 0 for x in range(100)
+            (i // 10) % 2 == 0 for i in range(100)
         ]
-        self.assertEqual(binarized, expected_binarized)
+        self.assertEqual(b, expected_binarized)
+        self.assertEqual(x, 10)
+        self.assertEqual(y, 10)
 
     def test_horizontal_stripes_10x10_to_15x10_image(self):
         printer_x_res = 15
         printer_y_res = 10
 
-        binarized = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
+        b, x, y = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
         expected_binarized = [
             (x // 10) % 2 == 0 for x in range(100)
         ]
 
-        self.assertEqual(binarized, expected_binarized)
+        self.assertEqual(b, expected_binarized)
+        self.assertEqual(x, 10)
+        self.assertEqual(y, 10)
 
     def test_horizontal_stripes_10x10_to_8x7_image(self):
         printer_x_res = 8
         printer_y_res = 7
 
-        binarized = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
+        b, x, y = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
         expected_binarized = [
             True, True, True, True, True, True, True,
             True, True, True, True, True, True, True,
@@ -459,11 +463,13 @@ class BinarizeImageTests(unittest.TestCase):
             False, False, False, False, False, False, False
         ]
 
-        self.assertEqual(binarized, expected_binarized)
+        self.assertEqual(b, expected_binarized)
+        self.assertEqual(x, 7)
+        self.assertEqual(y, 7)
 
 
 class GenerateAndBinarizeTestImage(unittest.TestCase):
     def test_generate_and_binarize_test_image(self):
         for pixel_size in [utilities.PixelSize.PIXEL_1x1, utilities.PixelSize.PIXEL_2x2, utilities.PixelSize.PIXEL_4x4]:
-            self.binarized = utilities.generate_and_binarize_test_image(pixel_size)
-            self.assertEqual(len(self.binarized), utilities.MAX_X_RES // pixel_size * 90)
+            self.binarized, img_x, img_y = utilities.generate_and_binarize_test_image(pixel_size)
+            self.assertEqual(len(self.binarized), img_x * img_y)

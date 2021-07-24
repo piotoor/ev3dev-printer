@@ -21,6 +21,8 @@ class Printer:
 
         self._x_res = utilities.MAX_X_RES / int(pixel_size)
         self._y_res = utilities.MAX_Y_RES / int(pixel_size)
+        self.padding_left = utilities.MAX_PADDING_LEFT / int(pixel_size)
+        self.padding_right = utilities.MAX_PADDING_RIGHT / int(pixel_size)
         self._is_pen_up = True
         self._pen_calibrated = False
 

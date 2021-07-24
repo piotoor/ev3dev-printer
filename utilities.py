@@ -22,7 +22,7 @@ class PixelSize(IntEnum):
     PIXEL_4x4 = 4
 
 
-def binarized_image_to_p_codes(binarized, x_res, y_res, padding_left=0):
+def binarized_image_to_p_codes(binarized, x_res, y_res, padding_left):
     p_codes = []
     rows = int(y_res)
     cols = int(x_res)

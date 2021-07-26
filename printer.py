@@ -21,8 +21,8 @@ class Printer:
 
         self._x_res = utilities.MAX_X_RES / int(pixel_size)
         self._y_res = utilities.MAX_Y_RES / int(pixel_size)
-        self.padding_left = utilities.MAX_PADDING_LEFT / int(pixel_size)
-        self.padding_right = utilities.MAX_PADDING_RIGHT / int(pixel_size)
+        self._padding_left = utilities.MAX_PADDING_LEFT / int(pixel_size)
+        self._padding_right = utilities.MAX_PADDING_RIGHT / int(pixel_size)
         self._is_pen_up = True
         self._pen_calibrated = False
 
@@ -135,7 +135,7 @@ class Printer:
             speaker.speak("Printing test page")
             print("\nPrinting test page...")
 
-        p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y)
+        p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y, self._padding_left)
         btn = Button()
 
         print("---------- p_codes:----------")

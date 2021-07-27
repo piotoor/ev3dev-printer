@@ -1,5 +1,5 @@
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_B, OUTPUT_C, Motor
-from ev3dev2.sensor import INPUT_1, INPUT_2
+from ev3dev2.sensor import INPUT_1, INPUT_4
 from ev3dev2.sensor.lego import TouchSensor
 from ev3dev2.sensor.lego import ColorSensor
 from ev3dev2.button import Button
@@ -13,7 +13,7 @@ class Printer:
 
     def __init__(self, pixel_size):
         self._touch = TouchSensor(INPUT_1)
-        self._color = ColorSensor(INPUT_2)
+        self._color = ColorSensor(INPUT_4)
         self._color.mode = 'COL-COLOR'
         self._fb_motor = LargeMotor(OUTPUT_C)
         self._lr_motor = LargeMotor(OUTPUT_B)
@@ -27,7 +27,7 @@ class Printer:
         self._pen_calibrated = False
 
         self._ud_ratio = 5
-        self._fb_ratio = 5
+        self._fb_ratio = 4
         self._lr_ratio = 1
         self._pen_up_val = -3 * self._ud_ratio
         self._pen_down_val = -self._pen_up_val
@@ -107,14 +107,21 @@ class Printer:
                 self._pen_down(4)
 
         self._lr_motor.reset()
-        self._pen_up(1)
-        speaker.speak("Insert a blank piece of paper and press the touch sensor")
-        self._touch.wait_for_pressed()
+        if not self._is_pen_up:
+            self._pen_up(1)
 
         self._lr_motor.stop()
         self._lr_motor.on_for_degrees(10, 120)
         self._lr_motor.reset()
+        # binarized, img_x, img_y = utilities.generate_and_binarize_calibration_test_image(self._pixel_size)
+        # p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y, self._padding_left)
+        # self._interpret_p_codes(p_codes)
 
+        speaker.speak("Insert a blank piece of paper and press the touch sensor")
+        self._touch.wait_for_pressed()
+        self._lr_motor.stop()
+        # self._lr_motor.on_for_degrees(10, 120)
+        self._lr_motor.reset()
         self._fb_motor.on(5)
         val = 0
         while self.colors[val] == 'unknown':
@@ -123,20 +130,10 @@ class Printer:
 
         self._fb_motor.reset()
 
-    def draw(self, path=None):
-        speaker = Sound()
-
-        if path is not None:
-            binarized, img_x, img_y = utilities.binarize_image(path, self._x_res, self._y_res)
-            speaker.speak("Printing image")
-            print("\nPrinting image...")
-        else:
-            binarized, img_x, img_y = utilities.generate_and_binarize_test_image(self._pixel_size)
-            speaker.speak("Printing test page")
-            print("\nPrinting test page...")
-
-        p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y, self._padding_left)
+    def _interpret_p_codes(self, p_codes):
         btn = Button()
+        speaker = Sound()
+        self._current_line = 0
 
         print("---------- p_codes:----------")
         print("-------------- Line {} --------------".format(self._current_line))
@@ -163,8 +160,26 @@ class Printer:
             elif x[0] == utilities.Command.SCROLL:
                 self._paper_scroll(x[1])
 
-        self._ud_motor.on_for_degrees(self._pen_up_down_speed, self._pen_up_val)
+        if not self._is_pen_up:
+            self._pen_up(1)
         self._ud_motor.stop()
+
+    def draw(self, path=None):
+        speaker = Sound()
+
+        if path is not None:
+            binarized, img_x, img_y = utilities.binarize_image(path, self._x_res, self._y_res)
+            speaker.speak("Printing image")
+            print("\nPrinting image...")
+        else:
+            binarized, img_x, img_y = utilities.generate_and_binarize_test_image(self._pixel_size)
+            speaker.speak("Printing test page")
+            print("\nPrinting test page...")
+
+        p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y, self._padding_left)
+
+        self._interpret_p_codes(p_codes)
+
         # self._fb_motor.on_for_degrees(10, 360)
         self._paper_scroll(self._y_res)
         self._fb_motor.reset()

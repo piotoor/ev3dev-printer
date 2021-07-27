@@ -548,3 +548,8 @@ class GenerateAndBinarizeTestImage(unittest.TestCase):
         for pixel_size in [utilities.PixelSize.PIXEL_1x1, utilities.PixelSize.PIXEL_2x2, utilities.PixelSize.PIXEL_4x4]:
             self.binarized, img_x, img_y = utilities.generate_and_binarize_test_image(pixel_size)
             self.assertEqual(len(self.binarized), img_x * img_y)
+
+    def test_generate_and_binarize_calibration_test_image(self):
+        for pixel_size in [utilities.PixelSize.PIXEL_1x1, utilities.PixelSize.PIXEL_2x2, utilities.PixelSize.PIXEL_4x4]:
+            self.binarized, img_x, img_y = utilities.generate_and_binarize_calibration_test_image(pixel_size)
+            self.assertEqual(len(self.binarized), img_x * img_y)

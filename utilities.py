@@ -4,8 +4,8 @@ from enum import IntEnum
 
 MAX_X_RES = 300
 MAX_Y_RES = 360
-MAX_PADDING_LEFT = 8
-MAX_PADDING_RIGHT = 8
+MAX_PADDING_LEFT = 16
+MAX_PADDING_RIGHT = 0
 
 
 class Command(Enum):
@@ -100,3 +100,11 @@ def generate_and_binarize_test_image(pixel_size):
         binarized.extend([0 if (i % 2 == 0) else 1 for i in range(x_res)])
 
     return list(map(bool, binarized)), x_res, 90
+
+
+def generate_and_binarize_calibration_test_image(pixel_size):
+    x_res = MAX_X_RES // int(pixel_size)
+
+    binarized = ([1 for _ in range(x_res * 2)] + [0 for _ in range(x_res * 2)]) * 3  # 12 rows
+
+    return list(map(bool, binarized)), x_res, 12

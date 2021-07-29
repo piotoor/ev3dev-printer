@@ -32,8 +32,8 @@ class Printer:
         self._pen_up_val = -3 * self._ud_ratio
         self._pen_down_val = -self._pen_up_val
         self._pen_up_down_speed = 10
-        self._pen_left_speed = 15
-        self._pen_right_speed = 10
+        self._pen_left_speed = 20
+        self._pen_right_speed = 20
         self._paper_scroll_speed = 20
 
         self._pixel_size = pixel_size

@@ -42,27 +42,33 @@ class Printer:
 
     def _pen_up(self, val):
         print("{} {}".format('PEN_UP', val))
-        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val * self._pen_up_val)
-        self._is_pen_up = True
+        if val > 0:
+            self._ud_motor.on_for_degrees(self._pen_up_down_speed, val * self._pen_up_val)
+            self._is_pen_up = True
 
     def _pen_down(self, val):
         print("{} {}".format('PEN_DOWN', val))
-        self._ud_motor.on_for_degrees(self._pen_up_down_speed, val * self._pen_down_val)
-        self._is_pen_up = False
+        if val > 0:
+            self._ud_motor.on_for_degrees(self._pen_up_down_speed, val * self._pen_down_val)
+            self._is_pen_up = False
 
     def _pen_left(self, val):
         print("{} {}".format('PEN_LEFT', val))
-        self._lr_motor.on_for_degrees(self._pen_left_speed, int(self._pixel_size) * val * self._lr_ratio)
+        if val > 0:
+            self._lr_motor.on_for_degrees(self._pen_left_speed, int(self._pixel_size) * val * self._lr_ratio)
 
     def _pen_right(self, val):
         print("{} {}".format('PEN_RIGHT', val))
-        self._lr_motor.on_for_degrees(self._pen_right_speed, -int(self._pixel_size) * val * self._lr_ratio)
+        if val > 0:
+            self._lr_motor.on_for_degrees(self._pen_right_speed, -int(self._pixel_size) * val * self._lr_ratio)
 
     def _paper_scroll(self, val):
         print("{} {}".format('SCROLL', val))
-        self._current_line += 1
-        print("-------------- Line {} --------------".format(self._current_line))
-        self._fb_motor.on_for_degrees(self._paper_scroll_speed, int(self._pixel_size) * val * self._fb_ratio)
+        if val > 0:
+            if val == 1:
+                self._current_line += val
+                print("-------------- Line {} --------------".format(self._current_line))
+            self._fb_motor.on_for_degrees(self._paper_scroll_speed, int(self._pixel_size) * val * self._fb_ratio)
 
     def _finish_calibration(self):
         self._pen_calibrated = True
@@ -70,13 +76,14 @@ class Printer:
     def calibrate(self):
         speaker = Sound()
         speaker.speak("Calibrating")
+        print("Calibrating...")
         btn = Button()
 
         self._lr_motor.reset()
         self._ud_motor.reset()
         self._fb_motor.reset()
 
-        self._lr_motor.on_for_degrees(10, 320)
+        self._lr_motor.on_for_degrees(10, self._x_res)
         self._lr_motor.reset()
 
         self._ud_motor.on(-15)
@@ -92,6 +99,7 @@ class Printer:
         speaker.speak("Insert calibration paper and press the touch sensor")
         self._touch.wait_for_pressed()
         speaker.speak("Adjust pen height")
+        print("Adjust pen height...")
 
         while not self._pen_calibrated:
             self._lr_motor.on_for_degrees(10, -100)
@@ -111,24 +119,20 @@ class Printer:
             self._pen_up(1)
 
         self._lr_motor.stop()
-        self._lr_motor.on_for_degrees(10, 120)
+        self._lr_motor.on_for_degrees(10, 100)
+
         self._lr_motor.reset()
-        # binarized, img_x, img_y = utilities.generate_and_binarize_calibration_test_image(self._pixel_size)
-        # p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y, self._padding_left)
-        # self._interpret_p_codes(p_codes)
 
         speaker.speak("Insert a blank piece of paper and press the touch sensor")
         self._touch.wait_for_pressed()
-        self._lr_motor.stop()
-        # self._lr_motor.on_for_degrees(10, 120)
-        self._lr_motor.reset()
         self._fb_motor.on(5)
         val = 0
+        print("Scrolling the piece of paper to its starting position...")
         while self.colors[val] == 'unknown':
             val = self._color.value()
-            print("Color = {}".format(self.colors[val]))
 
         self._fb_motor.reset()
+        print("Calibration done")
 
     def _interpret_p_codes(self, p_codes):
         btn = Button()

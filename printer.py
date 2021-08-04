@@ -121,17 +121,18 @@ class Printer:
 
             self._lr_motor.reset()
 
-        self._pen_left(100)
         if not self._is_pen_up:
             self._pen_up(1)
+        self._pen_left(self._x_res)
+
         for _ in range(2):
             self._pen_right(self._x_res)
             self._pen_left(self._x_res)
-        for _ in range(2):
+        for _ in range(4):
+            self._pen_right(self._padding_left)
             for _ in range(int(self._x_res)):
                 self._pen_right(1)
-            for _ in range(int(self._x_res)):
-                self._pen_left(1)
+            self._pen_left(self._x_res + self._padding_left)
         self._lr_motor.reset()
 
         speaker.speak("Insert a blank piece of paper and press the touch sensor")

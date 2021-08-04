@@ -1,6 +1,11 @@
 #!/bin/bash
 
-if(($#==2));
+if(($#==3));
+then
+  scp "$1" robot@10.42.0.3:/home/robot/
+  # shellcheck disable=SC2029
+  ssh robot@10.42.0.3 "python3 main.py -f $1 -p $2 $3 | tee log.txt"
+elif(($#==2));
 then
   scp "$1" robot@10.42.0.3:/home/robot/
   # shellcheck disable=SC2029

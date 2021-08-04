@@ -73,54 +73,65 @@ class Printer:
     def _finish_calibration(self):
         self._pen_calibrated = True
 
-    def calibrate(self):
+    def calibrate(self, quick_calibration):
         speaker = Sound()
-        speaker.speak("Calibrating")
-        print("Calibrating...")
-        btn = Button()
 
-        self._lr_motor.reset()
-        self._ud_motor.reset()
-        self._fb_motor.reset()
+        if quick_calibration:
+            speaker.speak("Quick calibration")
+            print("Quick calibration...")
+        else:
+            speaker.speak("Calibrating")
+            print("Calibrating...")
+            btn = Button()
 
-        self._lr_motor.on_for_degrees(10, self._x_res)
-        self._lr_motor.reset()
+            self._lr_motor.reset()
+            self._ud_motor.reset()
+            self._fb_motor.reset()
 
-        self._ud_motor.on(-15)
-        self._touch.wait_for_pressed()
-        self._ud_motor.stop()
-        time.sleep(1)
-        self._ud_motor.on(15)
-        self._touch.wait_for_released()
-        self._ud_motor.on_for_degrees(10, 40)
-        self._ud_motor.stop()
-        time.sleep(1)
+            self._lr_motor.on_for_degrees(self._pen_left_speed, self._x_res * self._pixel_size * self._lr_ratio)
+            self._lr_motor.reset()
 
-        speaker.speak("Insert calibration paper and press the touch sensor")
-        self._touch.wait_for_pressed()
-        speaker.speak("Adjust pen height")
-        print("Adjust pen height...")
-
-        while not self._pen_calibrated:
-            self._lr_motor.on_for_degrees(10, -100)
-            self._lr_motor.on_for_degrees(10, 100)
+            self._ud_motor.on(-15)
+            self._touch.wait_for_pressed()
+            self._ud_motor.stop()
             time.sleep(1)
-            if btn.up:
-                self._pen_up(1)
-            elif btn.down:
-                self._pen_down(1)
-            elif btn.right:
-                self._finish_calibration()
-            elif btn.left:
-                self._pen_down(4)
+            self._ud_motor.on(15)
+            self._touch.wait_for_released()
+            self._ud_motor.on_for_degrees(10, 40)
+            self._ud_motor.stop()
+            time.sleep(1)
 
-        self._lr_motor.reset()
+            speaker.speak("Insert calibration paper and press the touch sensor")
+            self._touch.wait_for_pressed()
+            speaker.speak("Adjust pen height")
+            print("Adjust pen height...")
+
+            while not self._pen_calibrated:
+                self._lr_motor.on_for_degrees(self._pen_right_speed, -100 * self._pixel_size * self._lr_ratio)
+                self._lr_motor.on_for_degrees(self._pen_left_speed, 100 * self._pixel_size * self._lr_ratio)
+                time.sleep(1)
+                if btn.up:
+                    self._pen_up(1)
+                elif btn.down:
+                    self._pen_down(1)
+                elif btn.right:
+                    self._finish_calibration()
+                elif btn.left:
+                    self._pen_down(4)
+
+            self._lr_motor.reset()
+
+        self._pen_left(100)
         if not self._is_pen_up:
             self._pen_up(1)
-
-        self._lr_motor.stop()
-        self._lr_motor.on_for_degrees(10, 100)
-
+        for _ in range(2):
+            self._pen_right(self._x_res)
+            self._pen_left(self._x_res)
+        for _ in range(2):
+            for _ in range(int(self._x_res)):
+                self._pen_right(1)
+            for _ in range(int(self._x_res)):
+                self._pen_left(1)
         self._lr_motor.reset()
 
         speaker.speak("Insert a blank piece of paper and press the touch sensor")
@@ -181,7 +192,7 @@ class Printer:
             print("\nPrinting test page...")
 
         p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y, self._padding_left)
-
+        # print("starting motor position = {}".format(self._lr_motor.position))
         self._interpret_p_codes(p_codes)
 
         # self._fb_motor.on_for_degrees(10, 360)

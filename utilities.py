@@ -91,7 +91,7 @@ def generate_and_binarize_test_image(pixel_size):
 
     for i in range(2):  # 22 rows
         for x in t:
-            binarized.extend(([0, 0] + x + [0, 0]) * (8 // int(pixel_size)) + [0] * (12 // int(pixel_size)))
+            binarized.extend(x * (8 // int(pixel_size)) + [0] * (24 // int(pixel_size)))
 
         binarized.extend([0] * x_res)
 

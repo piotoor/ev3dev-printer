@@ -2,9 +2,9 @@ from enum import Enum
 from PIL import Image
 from enum import IntEnum
 
-MAX_X_RES = 300
+MAX_X_RES = 280
 MAX_Y_RES = 360
-MAX_PADDING_LEFT = 16
+MAX_PADDING_LEFT = 30
 MAX_PADDING_RIGHT = 0
 
 

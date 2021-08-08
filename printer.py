@@ -180,27 +180,37 @@ class Printer:
             self._pen_up(1)
         self._ud_motor.stop()
 
-    def draw(self, path=None):
+    def draw(self, path=None, multicolor=False):
         speaker = Sound()
 
         if path is not None:
-            binarized, img_x, img_y = utilities.binarize_image(path, self._x_res, self._y_res)
-            speaker.speak("Printing image")
-            print("\nPrinting image...")
+            if multicolor:
+                speaker.speak("Printing multi color image")
+                print("\nPrinting multi color image...")
+            else:
+                speaker.speak("Printing single color image")
+                print("\nPrinting single color image...")
+
+            binarized, img_x, img_y = utilities.binarize_image(path, self._x_res, self._y_res, multicolor)
         else:
             binarized, img_x, img_y = utilities.generate_and_binarize_test_image(self._pixel_size)
             speaker.speak("Printing test page")
             print("\nPrinting test page...")
 
-        p_codes = utilities.binarized_image_to_p_codes(binarized, img_x, img_y, self._padding_left)
-        # print("starting motor position = {}".format(self._lr_motor.position))
-        self._interpret_p_codes(p_codes)
+        quick_calibration = False
+        for layer, i in binarized, range(1, utilities.NUM_OF_COLORS):
+            speaker.speak("Insert a {} pen and press the touch sensor".format(utilities.palette_names[i]))
+            self._touch.wait_for_pressed()
+            self.calibrate(quick_calibration)
 
-        # self._fb_motor.on_for_degrees(10, 360)
-        self._paper_scroll(self._y_res)
-        self._fb_motor.reset()
-        self._ud_motor.reset()
-        self._lr_motor.reset()
+            p_codes = utilities.binarized_image_to_p_codes(layer, img_x, img_y, self._padding_left)
+            self._interpret_p_codes(p_codes)
+
+            self._paper_scroll(self._y_res)
+            self._fb_motor.reset()
+            self._ud_motor.reset()
+            self._lr_motor.reset()
+            quick_calibration = True
 
         speaker = Sound()
         speaker.speak("Printing finished")

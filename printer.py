@@ -150,6 +150,7 @@ class Printer:
         btn = Button()
         speaker = Sound()
         self._current_line = 0
+        abort = False
 
         print("---------- p_codes:----------")
         print("-------------- Line {} --------------".format(self._current_line))
@@ -157,6 +158,7 @@ class Printer:
             if btn.down:
                 speaker.speak("Aborting")
                 print("\nAborting...")
+                abort = True
                 break
 
             if x[0] == utilities.Command.PEN_UP:
@@ -179,6 +181,8 @@ class Printer:
         if not self._is_pen_up:
             self._pen_up(1)
         self._ud_motor.stop()
+
+        return abort
 
     def draw(self, path=None, multicolor=False):
         speaker = Sound()
@@ -204,7 +208,8 @@ class Printer:
             self.calibrate(quick_calibration)
 
             p_codes = utilities.binarized_image_to_p_codes(layer, img_x, img_y, self._padding_left)
-            self._interpret_p_codes(p_codes)
+            if self._interpret_p_codes(p_codes):
+                break
 
             self._paper_scroll(self._y_res)
             self._fb_motor.reset()

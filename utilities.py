@@ -8,7 +8,7 @@ MAX_PADDING_LEFT = 30
 MAX_PADDING_RIGHT = 0
 NUM_OF_COLORS = 6
 palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 86, 193)
-palette_names = ("while", "black", "red", "green", "blue", "pink")
+palette_names = ("white", "black", "red", "green", "blue", "pink")
 
 
 class Command(Enum):

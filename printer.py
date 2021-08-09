@@ -198,7 +198,7 @@ class Printer:
             print("\nPrinting test page...")
 
         quick_calibration = False
-        for layer, i in binarized, range(1, utilities.NUM_OF_COLORS):
+        for layer, i in zip(binarized, range(1, utilities.NUM_OF_COLORS)):
             speaker.speak("Insert a {} pen and press the touch sensor".format(utilities.palette_names[i]))
             self._touch.wait_for_pressed()
             self.calibrate(quick_calibration)

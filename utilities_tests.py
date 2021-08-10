@@ -498,7 +498,7 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
 
 
 class BinarizeImageTests(unittest.TestCase):
-    def test_horizontal_stripes_10x10_to_10x10_image(self):
+    def test_single_color_horizontal_stripes_10x10_to_10x10_image(self):
         printer_x_res = 10
         printer_y_res = 10
 
@@ -506,11 +506,11 @@ class BinarizeImageTests(unittest.TestCase):
         expected_binarized = [
             (i // 10) % 2 == 0 for i in range(100)
         ]
-        self.assertEqual(b, expected_binarized)
+        self.assertEqual(b[0], expected_binarized)
         self.assertEqual(x, 10)
         self.assertEqual(y, 10)
 
-    def test_horizontal_stripes_10x10_to_15x10_image(self):
+    def test_single_color_horizontal_stripes_10x10_to_15x10_image(self):
         printer_x_res = 15
         printer_y_res = 10
 
@@ -519,11 +519,11 @@ class BinarizeImageTests(unittest.TestCase):
             (x // 10) % 2 == 0 for x in range(100)
         ]
 
-        self.assertEqual(b, expected_binarized)
+        self.assertEqual(b[0], expected_binarized)
         self.assertEqual(x, 10)
         self.assertEqual(y, 10)
 
-    def test_horizontal_stripes_10x10_to_8x7_image(self):
+    def test_single_color_horizontal_stripes_10x10_to_8x7_image(self):
         printer_x_res = 8
         printer_y_res = 7
 
@@ -538,18 +538,61 @@ class BinarizeImageTests(unittest.TestCase):
             False, False, False, False, False, False, False
         ]
 
-        self.assertEqual(b, expected_binarized)
+        self.assertEqual(b[0], expected_binarized)
         self.assertEqual(x, 7)
         self.assertEqual(y, 7)
+
+    def test_multi_color_horizontal_stripes_5x5_to_5x5_image(self):
+        printer_x_res = 5
+        printer_y_res = 5
+
+        bnrzd, x, y = utilities.binarize_image("test_images/multicolor_square.png", printer_x_res, printer_y_res, True)
+        expected_binarized = [
+            [True, False, False, False, False,
+             False, True, False, False, False,
+             False, False, True, False, False,
+             False, False, False, True, False,
+             False, False, False, False, True],
+
+            [False, False, False, True, True,
+             False, False, False, False, False,
+             False, False, False, False, False,
+             False, False, False, False, False,
+             False, False, False, False, False],
+
+            [False, False, False, False, False,
+             False, False, False, True, True,
+             False, False, False, True, True,
+             False, False, False, False, False,
+             False, False, False, False, False],
+
+            [False, False, False, False, False,
+             True, False, False, False, False,
+             True, False, False, False, False,
+             True, False, False, False, False,
+             False, True, True, False, False],
+
+            [False, False, False, False, False,
+             False, False, False, False, False,
+             False, False, False, False, False,
+             False, False, False, False, True,
+             True, False, False, True, False],
+        ]
+
+        self.assertEqual(len(bnrzd), utilities.NUM_OF_COLORS - 1)
+        for b, e in zip(bnrzd, expected_binarized):
+            self.assertEqual(b, e)
+        self.assertEqual(x, 5)
+        self.assertEqual(y, 5)
 
 
 class GenerateAndBinarizeTestImage(unittest.TestCase):
     def test_generate_and_binarize_test_image(self):
         for pixel_size in [utilities.PixelSize.PIXEL_1x1, utilities.PixelSize.PIXEL_2x2, utilities.PixelSize.PIXEL_4x4]:
             self.binarized, img_x, img_y = utilities.generate_and_binarize_test_image(pixel_size)
-            self.assertEqual(len(self.binarized), img_x * img_y)
+            self.assertEqual(len(self.binarized[0]), img_x * img_y)
 
     def test_generate_and_binarize_calibration_test_image(self):
         for pixel_size in [utilities.PixelSize.PIXEL_1x1, utilities.PixelSize.PIXEL_2x2, utilities.PixelSize.PIXEL_4x4]:
             self.binarized, img_x, img_y = utilities.generate_and_binarize_calibration_test_image(pixel_size)
-            self.assertEqual(len(self.binarized), img_x * img_y)
+            self.assertEqual(len(self.binarized[0]), img_x * img_y)

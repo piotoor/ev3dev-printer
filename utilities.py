@@ -6,6 +6,9 @@ MAX_X_RES = 280
 MAX_Y_RES = 360
 MAX_PADDING_LEFT = 30
 MAX_PADDING_RIGHT = 0
+NUM_OF_COLORS = 6
+palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
+palette_names = ("white", "black", "red", "green", "blue", "pink")
 
 
 class Command(Enum):
@@ -61,16 +64,28 @@ def binarized_image_to_p_codes(binarized, x_res, y_res, padding_left):
     return p_codes
 
 
-def binarize_image(path, x_res, y_res):
-    img = Image.open(path).convert('1')
-
+def binarize_image(path, x_res, y_res, multicolor=False):
+    img = Image.open(path)
     ratio = min(x_res / img.width, y_res / img.height)
     img_x = int(img.width * ratio)
     img_y = int(img.height * ratio)
     print("{} {} x {} resized to {} x {}".format(path, img.width, img.height, img_x, img_y))
-    img = img.resize((img_x, img_y))
-    pixels = list(img.getdata())
-    return list(map(lambda val: not val, pixels)), img_x, img_y
+    layers = []
+
+    if multicolor:
+        pal_img = Image.new("P", (1, 1))
+        pal_img.putpalette(palette + (255, 255, 255) * 250)
+        img = img.convert("RGB").quantize(palette=pal_img).resize((img_x, img_y))
+        pixels = list(img.getdata())
+        for color_i in range(1, len(palette) // 3):
+            layers.append(list(map(lambda x: x == color_i, pixels)))
+    else:
+        img = img.convert('1')
+        img = img.resize((img_x, img_y))
+        pixels = list(img.getdata())
+        layers = [list(map(lambda val: not val, pixels))]
+
+    return layers, img_x, img_y
 
 
 def generate_and_binarize_test_image(pixel_size):
@@ -99,7 +114,7 @@ def generate_and_binarize_test_image(pixel_size):
         binarized.extend([1 if (i % 2 == 0) else 0 for i in range(x_res)])
         binarized.extend([0 if (i % 2 == 0) else 1 for i in range(x_res)])
 
-    return list(map(bool, binarized)), x_res, 90
+    return [list(map(bool, binarized))], x_res, 90
 
 
 def generate_and_binarize_calibration_test_image(pixel_size):
@@ -107,4 +122,4 @@ def generate_and_binarize_calibration_test_image(pixel_size):
 
     binarized = ([1 for _ in range(x_res * 2)] + [0 for _ in range(x_res * 2)]) * 3  # 12 rows
 
-    return list(map(bool, binarized)), x_res, 12
+    return [list(map(bool, binarized))], x_res, 12

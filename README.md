@@ -20,8 +20,8 @@ Assembling instructions:
 TODO
 
 ### Software
-The main.py script loads an input file, changes its resolution, reduces it to
-dithered 2 color image and finally prints it.
+Python scripts load an input file, change its resolution, reduce the number of colors
+to 2 (single pen) or 6 (5 pens) and finally print it.
 
 ## Technologies
 * python
@@ -35,20 +35,20 @@ TODO
 
 ## Features
 * Paper format: A5
-* Output resolution: 160 x 180
-* Number of colors: 2 (pen color + background). Uses dithering.
+* Output resolution: 150 x 180
+* Number of colors in basic mode: 2 (pen color + background).
+* Number of colors in multicolor mode: 6 (5 pens + background). Multi-pass printing with manual pen switching.
 * Semi-automatic calibration
 
 Sample printouts:
-![printer](photos/printout2.jpg)
+![printer](photos/example.png)
 
 
 ### Future features:
-* Resolution increased to 320 x 360
-* Multi color printing (automatic pen switcher or multi-pass printing with manual color switching before each pass)
-* Improved speed and accuracy
-* Automatic calibration
+* Resolution increased to 300 x 360
+* Multicolor printing with any number of pens.
+* Improved accuracy
+
 
 ## Status
-The project is in progress. It started as a proof of concept. Lots of stuff is still hard-coded.
-Refactoring ongoing.
+The project is in progress.

@@ -41,6 +41,7 @@ TODO
 * Semi-automatic calibration
 
 Sample printouts:
+
 ![printer](photos/example.png)
 
 

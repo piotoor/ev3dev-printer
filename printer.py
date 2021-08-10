@@ -128,7 +128,7 @@ class Printer:
         for _ in range(2):
             self._pen_right(self._x_res)
             self._pen_left(self._x_res)
-        for _ in range(4):
+        for _ in range(8):
             self._pen_right(self._padding_left)
             for _ in range(int(self._x_res)):
                 self._pen_right(1)

@@ -140,7 +140,7 @@ class Printer:
         self._fb_motor.on(5)
         val = 0
         print("Scrolling the piece of paper to its starting position...")
-        while self.colors[val] == 'unknown':
+        while self.colors[val] == 'black':
             val = self._color.value()
 
         self._fb_motor.reset()

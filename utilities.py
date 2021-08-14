@@ -1,6 +1,7 @@
 from enum import Enum
 from PIL import Image
 from enum import IntEnum
+from PIL import ImageColor
 
 MAX_X_RES = 280
 MAX_Y_RES = 360
@@ -123,3 +124,16 @@ def generate_and_binarize_calibration_test_image(pixel_size):
     binarized = ([1 for _ in range(x_res * 2)] + [0 for _ in range(x_res * 2)]) * 3  # 12 rows
 
     return [list(map(bool, binarized))], x_res, 12
+
+
+def rgb_to_the_closest_color_name(rgb):
+    color_distances = {}
+
+    for name, code in sorted(list(ImageColor.colormap.items()), key=lambda x: x[1]):
+        r, g, b = ImageColor.getcolor(code, "RGB")
+        rd = (rgb[0] - r) ** 2
+        gd = (rgb[1] - g) ** 2
+        bd = (rgb[2] - b) ** 2
+        color_distances[(rd + gd + bd)] = name
+
+    return color_distances[min(color_distances.keys())]

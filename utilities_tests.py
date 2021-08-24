@@ -513,7 +513,7 @@ class GenerateAndBinarizeTestImage(unittest.TestCase):
         self.assertEqual(expected_x_res * expected_y_res, len(binarized[0]))
 
 
-class ColorConversions(unittest.TestCase):
+class PaletteManagement(unittest.TestCase):
     def test_rgb_to_the_closest_color_name(self):
         rgb_values = [
             (0, 0, 0),
@@ -897,3 +897,20 @@ class ColorConversions(unittest.TestCase):
 
         for rgb, name in zip(rgb_values, expected_names):
             self.assertEqual(utilities.rgb_to_the_closest_color_name(rgb), name)
+
+    def test_read_palette_from_file(self):
+        palette = utilities.read_palette_from_file("test_palette2.txt")
+        expected_palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
+        self.assertEqual(palette, expected_palette)
+
+    def test_save_palette_to_file(self):
+        expected_palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
+        utilities.save_palette_to_file("test_palette2.txt", expected_palette)
+        palette = utilities.read_palette_from_file("test_palette2.txt")
+        self.assertEqual(palette, expected_palette)
+
+    def test_generate_palette_color_names(self):
+        palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
+        palette_color_names = utilities.generate_palette_color_names(palette)
+        expected_color_names = ["white", "black", "red", "forestgreen", "mediumblue", "hotpink"]
+        self.assertEqual(palette_color_names, expected_color_names)

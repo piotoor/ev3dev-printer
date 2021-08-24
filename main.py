@@ -9,6 +9,7 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--file_name")
     # parser.add_argument("-q", "--quick_calibration", action="store_true")
     parser.add_argument("-m", "--multi_color", action="store_true")
+    parser.add_argument("-c", "--calibrate_palette", action="store_true")
     args = parser.parse_args()
 
     if args.pixel_size == 1:
@@ -20,6 +21,6 @@ if __name__ == '__main__':
 
     # ptr.calibrate(args.quick_calibration)
     if args.file_name:
-        ptr.draw(args.file_name, args.multi_color)
+        ptr.draw(args.file_name, args.multi_color, args.calibrate_palette)
     else:
         ptr.draw()

@@ -8,8 +8,6 @@ MAX_Y_RES = 360
 MAX_PADDING_LEFT = 30
 MAX_PADDING_RIGHT = 0
 NUM_OF_COLORS = 6
-palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
-palette_names = ("white", "black", "red", "green", "blue", "pink")
 
 
 class Command(Enum):
@@ -65,7 +63,7 @@ def binarized_image_to_p_codes(binarized, x_res, y_res, padding_left):
     return p_codes
 
 
-def binarize_image(path, x_res, y_res, multicolor=False):
+def binarize_image(path, x_res, y_res, multicolor=False, palette=None):
     img = Image.open(path)
     ratio = min(x_res / img.width, y_res / img.height)
     img_x = int(img.width * ratio)
@@ -75,7 +73,7 @@ def binarize_image(path, x_res, y_res, multicolor=False):
 
     if multicolor:
         pal_img = Image.new("P", (1, 1))
-        pal_img.putpalette(palette + (255, 255, 255) * 250)
+        pal_img.putpalette(palette + (255, 255, 255) * (256 - len(palette)))
         img = img.convert("RGB").quantize(palette=pal_img).resize((img_x, img_y))
         pixels = list(img.getdata())
         for color_i in range(1, len(palette) // 3):
@@ -137,3 +135,27 @@ def rgb_to_the_closest_color_name(rgb):
         color_distances[(rd + gd + bd)] = name
 
     return color_distances[min(color_distances.keys())]
+
+
+def read_palette_from_file(path):
+    palette_file = open(path, 'r')
+    for line in palette_file:
+        palette = [int(x) for x in line.split()]
+    palette_file.close()
+    return tuple(palette)
+
+
+def save_palette_to_file(path, palette):
+    with open(path, 'w') as palette_file:
+        for x in palette:
+            palette_file.write(str(x) + " ")
+
+
+def generate_palette_color_names(palette):
+    palette_color_names = []
+
+    for i in range(0, len(palette), 3):
+        color = (palette[i], palette[i + 1], palette[i + 2])
+        palette_color_names.append(rgb_to_the_closest_color_name(color))
+
+    return palette_color_names

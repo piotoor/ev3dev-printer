@@ -36,6 +36,9 @@ class Printer:
         self._pen_right_speed = 20
         self._paper_scroll_speed = 20
 
+        self._palette = []
+        self._palette_color_names = ["black"]
+        self._num_of_colors = 2
         self._pixel_size = pixel_size
         self._p_codes = []
         self._current_line = 0
@@ -73,7 +76,65 @@ class Printer:
     def _finish_calibration(self):
         self._pen_calibrated = True
 
-    def calibrate(self, quick_calibration):
+    def _palette_calibration(self):
+        curr_color_mode = self._color.mode
+        self._color.mode = 'RGB-RAW'
+
+        calibration_done = False
+
+        speaker = Sound()
+        palette = []
+        self._fb_motor.reset()
+        self._fb_motor.on(5)
+        initial_vals = prev_vals = self._color.rgb
+        epsilon = 10
+        new_color = True
+
+        while not calibration_done and not self._touch.value():
+            vals = self._color.rgb
+            delta_prev_vals = (abs(vals[0] - prev_vals[0]), abs(vals[1] - prev_vals[1]), abs(vals[2] - prev_vals[2]))
+            delta_init_vals = (
+                abs(vals[0] - initial_vals[0]), abs(vals[1] - initial_vals[1]), abs(vals[2] - initial_vals[2]))
+
+            if len(palette) > 0:
+                delta_last_vals = (
+                    abs(vals[0] - palette[-1][0]), abs(vals[1] - palette[-1][1]), abs(vals[2] - palette[-1][2]))
+            else:
+                delta_last_vals = (3 * epsilon, 3 * epsilon, 3 * epsilon)
+
+            if (len(palette) > 1 and max(delta_init_vals) <= 2 * epsilon and new_color) or abs(
+                    self._fb_motor.position) > 360 * self._fb_ratio:
+                calibration_done = True
+                new_color = False
+            elif max(delta_prev_vals) <= epsilon and new_color and max(delta_last_vals) >= 2 * epsilon:
+                palette.append(vals)
+                print("Added {} to palette".format(vals))
+                new_color = False
+
+            else:
+                new_color = True
+
+            prev_vals = vals
+            time.sleep(0.5)
+
+        if len(palette) < 2:
+            print("Invalid palette")
+        else:
+            print("Palette has been generated. Available colors:")
+            speaker.speak("Palette has been generated. Available colors:")
+            for x in palette:
+                print(utilities.rgb_to_the_closest_color_name(x))
+                speaker.speak("{}".format(utilities.rgb_to_the_closest_color_name(x)))
+
+        for x in palette:
+            for y in x:
+                self._palette.append(y)
+
+        self._color.mode = curr_color_mode
+        self._fb_motor.reset()
+        utilities.save_palette_to_file("palette.txt", self._palette)
+
+    def _pen_calibration(self, quick_calibration):
         speaker = Sound()
 
         if quick_calibration:
@@ -184,28 +245,47 @@ class Printer:
 
         return abort
 
-    def draw(self, path=None, multicolor=False):
+    def draw(self, path=None, multicolor=False, force_palette_calibration=False):
         speaker = Sound()
 
         if path is not None:
             if multicolor:
                 speaker.speak("Printing multi color image")
                 print("\nPrinting multi color image...")
+
+                if force_palette_calibration:
+                    print("Forced palette calibration")
+                    speaker.speak("Forced palette calibration")
+                    self._palette_calibration()
+                else:
+                    try:
+                        self._palette = utilities.read_palette_from_file("palette.txt")
+                        # validate size of palette
+                    except IOError:
+                        print("Error reading palette from file. Palette calibration needed")
+                        speaker.speak("Error reading palette from file. Palette calibration needed")
+                        self._palette_calibration()
+                        utilities.save_palette_to_file("palette.txt", self._palette)
+
             else:
                 speaker.speak("Printing single color image")
                 print("\nPrinting single color image...")
 
-            binarized, img_x, img_y = utilities.binarize_image(path, self._x_res, self._y_res, multicolor)
+            binarized, img_x, img_y = utilities.binarize_image(path, self._x_res, self._y_res, multicolor,
+                                                               self._palette)
         else:
             binarized, img_x, img_y = utilities.generate_and_binarize_test_image(self._pixel_size)
             speaker.speak("Printing test page")
             print("\nPrinting test page...")
 
         quick_calibration = False
-        for layer, i in zip(binarized, range(1, utilities.NUM_OF_COLORS)):
-            speaker.speak("Insert a {} pen and press the touch sensor".format(utilities.palette_names[i]))
+        self._num_of_colors = len(self._palette // 3)
+        self._palette_color_names = utilities.generate_palette_color_names(self._palette)
+
+        for layer, i in zip(binarized, range(1, self._num_of_colors)):
+            speaker.speak("Insert a {} pen and press the touch sensor".format(self._palette_color_names[i]))
             self._touch.wait_for_pressed()
-            self.calibrate(quick_calibration)
+            self._pen_calibration(quick_calibration)
 
             p_codes = utilities.binarized_image_to_p_codes(layer, img_x, img_y, self._padding_left)
             if self._interpret_p_codes(p_codes):

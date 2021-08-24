@@ -1,3 +1,4 @@
+import os
 import unittest
 import utilities
 from parameterized import parameterized_class, parameterized
@@ -907,6 +908,7 @@ class PaletteManagement(unittest.TestCase):
         expected_palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
         utilities.save_palette_to_file("test_palette2.txt", expected_palette)
         palette = utilities.read_palette_from_file("test_palette2.txt")
+        os.remove("test_palette2.txt")
         self.assertEqual(palette, expected_palette)
 
     def test_generate_palette_color_names(self):

@@ -498,57 +498,28 @@ class BinarizedImageToPCodesTests(unittest.TestCase):
             self.assertEqual(p_codes, expected_p_codes)
 
 
-class BinarizeImageTests(unittest.TestCase):
-    def test_single_color_horizontal_stripes_10x10_to_10x10_image(self):
-        printer_x_res = 10
-        printer_y_res = 10
-
-        b, x, y = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
-        expected_binarized = [
-            (i // 10) % 2 == 0 for i in range(100)
-        ]
-        self.assertEqual(b[0], expected_binarized)
-        self.assertEqual(x, 10)
-        self.assertEqual(y, 10)
-
-    def test_single_color_horizontal_stripes_10x10_to_15x10_image(self):
-        printer_x_res = 15
-        printer_y_res = 10
-
-        b, x, y = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
-        expected_binarized = [
-            (x // 10) % 2 == 0 for x in range(100)
-        ]
-
-        self.assertEqual(b[0], expected_binarized)
-        self.assertEqual(x, 10)
-        self.assertEqual(y, 10)
-
-    def test_single_color_horizontal_stripes_10x10_to_8x7_image(self):
-        printer_x_res = 8
-        printer_y_res = 7
-
-        b, x, y = utilities.binarize_image("test_images/horizontal_stripes_10x10.png", printer_x_res, printer_y_res)
-        expected_binarized = [
+@parameterized_class(("image_path", "x_res", "y_res", "multicolor", "expected_img", "expected_x", "expected_y"), [
+    ("test_images/horizontal_stripes_10x10.png", 10, 10, False, [(i // 10) % 2 == 0 for i in range(100)], 10, 10),
+    ("test_images/horizontal_stripes_10x10.png", 15, 10, False, [(i // 10) % 2 == 0 for i in range(100)], 10, 10),
+    ("test_images/horizontal_stripes_10x10.png", 8, 7, False, [
             True, True, True, True, True, True, True,
             True, True, True, True, True, True, True,
             False, False, False, False, False, False, False,
             False, False, False, False, False, False, False,
             True, True, True, True, True, True, True,
             False, False, False, False, False, False, False,
-            False, False, False, False, False, False, False
-        ]
+            False, False, False, False, False, False, False], 7, 7)
+])
+class BinarizeSingleColorImageTests(unittest.TestCase):
+    def test_binarize_image(self):
+        b, x, y = utilities.binarize_image(self.image_path, self.x_res, self.y_res, self.multicolor)
+        self.assertEqual(b[0], self.expected_img)
+        self.assertEqual(self.expected_x, y)
+        self.assertEqual(self.expected_y, y)
 
-        self.assertEqual(b[0], expected_binarized)
-        self.assertEqual(x, 7)
-        self.assertEqual(y, 7)
 
-    def test_multi_color_horizontal_stripes_5x5_to_5x5_image(self):
-        printer_x_res = 5
-        printer_y_res = 5
-
-        bnrzd, x, y = utilities.binarize_image("test_images/multicolor_square.png", printer_x_res, printer_y_res, True)
-        expected_binarized = [
+@parameterized_class(("image_path", "x_res", "y_res", "multicolor", "expected_img", "expected_x", "expected_y"), [
+    ("test_images/multicolor_square.png", 5, 5, True, [
             [True, False, False, False, False,
              False, True, False, False, False,
              False, False, True, False, False,
@@ -577,14 +548,18 @@ class BinarizeImageTests(unittest.TestCase):
              False, False, False, False, False,
              False, False, False, False, False,
              False, False, False, False, True,
-             True, False, False, True, False],
-        ]
+             True, False, False, True, False]], 5, 5),
+])
+class BinarizeMultiColorImageTests(unittest.TestCase):
+    def test_binarize_image(self):
+        b, x, y = utilities.binarize_image(self.image_path, self.x_res, self.y_res, self.multicolor)
+        self.assertEqual(self.expected_x, y)
+        self.assertEqual(self.expected_y, y)
 
-        self.assertEqual(len(bnrzd), utilities.NUM_OF_COLORS - 1)
-        for b, e in zip(bnrzd, expected_binarized):
-            self.assertEqual(b, e)
-        self.assertEqual(x, 5)
-        self.assertEqual(y, 5)
+        for b, e in zip(b, self.expected_img):
+            self.assertEqual(e, b)
+        self.assertEqual(self.expected_x, x)
+        self.assertEqual(self.expected_y, y)
 
 
 class GenerateAndBinarizeTestImage(unittest.TestCase):

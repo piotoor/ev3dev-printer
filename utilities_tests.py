@@ -1,5 +1,6 @@
 import unittest
 import utilities
+from parameterized import parameterized_class, parameterized
 
 
 class BinarizedImageToPCodesTests(unittest.TestCase):
@@ -587,12 +588,22 @@ class BinarizeImageTests(unittest.TestCase):
 
 
 class GenerateAndBinarizeTestImage(unittest.TestCase):
-    def test_generate_and_binarize_test_image(self):
-        for pixel_size in [utilities.PixelSize.PIXEL_1x1, utilities.PixelSize.PIXEL_2x2, utilities.PixelSize.PIXEL_4x4]:
-            self.binarized, img_x, img_y = utilities.generate_and_binarize_test_image(pixel_size)
-            self.assertEqual(len(self.binarized[0]), img_x * img_y)
+    @parameterized.expand([
+        ("1x1", utilities.PixelSize.PIXEL_1x1, (280, 90)),
+        ("2x2", utilities.PixelSize.PIXEL_2x2, (140, 90)),
+        ("3x3", utilities.PixelSize.PIXEL_4x4, (70, 90))
+    ])
+    def test_generate_and_binarize_test_image(self, _, pixel_size, expected):
+        binarized, img_x, img_y = utilities.generate_and_binarize_test_image(pixel_size)
+        expected_x_res, expected_y_res = expected
+        self.assertEqual(expected_x_res * expected_y_res, len(binarized[0]))
 
-    def test_generate_and_binarize_calibration_test_image(self):
-        for pixel_size in [utilities.PixelSize.PIXEL_1x1, utilities.PixelSize.PIXEL_2x2, utilities.PixelSize.PIXEL_4x4]:
-            self.binarized, img_x, img_y = utilities.generate_and_binarize_calibration_test_image(pixel_size)
-            self.assertEqual(len(self.binarized[0]), img_x * img_y)
+    @parameterized.expand([
+        ("1x1", utilities.PixelSize.PIXEL_1x1, (280, 12)),
+        ("2x2", utilities.PixelSize.PIXEL_2x2, (140, 12)),
+        ("3x3", utilities.PixelSize.PIXEL_4x4, (70, 12))
+    ])
+    def test_generate_and_binarize_calibration_test_image(self, _, pixel_size, expected ):
+        binarized, img_x, img_y = utilities.generate_and_binarize_calibration_test_image(pixel_size)
+        expected_x_res, expected_y_res = expected
+        self.assertEqual(expected_x_res * expected_y_res, len(binarized[0]))

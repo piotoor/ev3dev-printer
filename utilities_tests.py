@@ -1,501 +1,432 @@
 import unittest
 import utilities
 from parameterized import parameterized_class, parameterized
+from itertools import chain
+
+test_binarized_image_to_p_codes_data = [[
+    ("1x1 1", 1, 1,
+        [True],
+        [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_DOWN, 1],
+            [utilities.Command.PEN_RIGHT, 0],
+            [utilities.Command.PEN_UP, 1],
+            [utilities.Command.PEN_LEFT, 1 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1]
+        ], padding),
+    ("1x1 2", 1, 1,
+        [False],
+        [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_RIGHT, 0],
+            [utilities.Command.PEN_LEFT, 1 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1]
+        ], padding),
+    ("2x1 1", 2, 1,
+        [True, True],
+        [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_DOWN, 1],
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_UP, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1]
+        ], padding),
+    ("2x1 2", 2, 1,
+        [True, False],
+        [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_DOWN, 1],
+            [utilities.Command.PEN_RIGHT, 0],
+            [utilities.Command.PEN_UP, 1],
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1]
+        ], padding),
+    ("2x1 3", 2, 1,
+        [False, True],
+        [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_DOWN, 1],
+            [utilities.Command.PEN_RIGHT, 0],
+            [utilities.Command.PEN_UP, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1]
+        ], padding),
+    ("2x1 4", 2, 1,
+        [False, False],
+        [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1]
+        ], padding),
+    ("2x2 1", 2, 2,
+     [False, False,
+      False, False],
+     [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1],
+
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 2", 2, 2,
+     [False, False,
+      False, True],
+     [
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1],
+            
+            [utilities.Command.PEN_RIGHT, 1],
+            [utilities.Command.PEN_DOWN, 1],
+            [utilities.Command.PEN_RIGHT, 0],
+            [utilities.Command.PEN_UP, 1],
+            [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+            [utilities.Command.PEN_RIGHT, padding],
+            [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 3", 2, 2,
+     [False, False,
+      True, False],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 4", 2, 2,
+     [False, False,
+      True, True],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 5", 2, 2,
+     [False, True,
+      False, False],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 6", 2, 2,
+     [False, True,
+      False, True],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 7", 2, 2,
+     [False, True,
+      True, False],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 8", 2, 2,
+     [False, True,
+      True, True],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 9", 2, 2,
+     [True, False,
+      False, False],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 10", 2, 2,
+     [True, False,
+      False, True],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 11", 2, 2,
+     [True, False,
+      True, False],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 12", 2, 2,
+     [True, False,
+      True, True],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 13", 2, 2,
+     [True, True,
+      False, False],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 14", 2, 2,
+     [True, True,
+      False, True],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 15", 2, 2,
+     [True, True,
+      True, False],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("2x2 16", 2, 2,
+     [True, True,
+      True, True],
+     [
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 2 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ], padding),
+    ("10x10 1", 10, 10,
+     [(x // 10) % 2 == 0 for x in range(10 * 10)],
+        [[utilities.Command.PEN_RIGHT, padding]] + [
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 10 - 1],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_LEFT, 10 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+        [utilities.Command.PEN_RIGHT, 10 - 1],
+        [utilities.Command.PEN_LEFT, 10 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1]
+     ] * (10 // 2), padding),
+    ("10x10 2", 10, 10,
+     [x % 2 == 0 for x in range(10 * 10)],
+        [[utilities.Command.PEN_RIGHT, padding]] + [
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 2],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 2],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 2],
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 2],
+
+        [utilities.Command.PEN_DOWN, 1],
+        [utilities.Command.PEN_RIGHT, 0],
+        [utilities.Command.PEN_UP, 1],
+        [utilities.Command.PEN_RIGHT, 1],
+
+        [utilities.Command.PEN_LEFT, 10 - 1 + padding],
+        [utilities.Command.PEN_RIGHT, padding],
+        [utilities.Command.SCROLL, 1],
+     ] * 10, padding),
+] for padding in [
+    utilities.MAX_PADDING_LEFT // utilities.PixelSize.PIXEL_1x1,
+    utilities.MAX_PADDING_LEFT // utilities.PixelSize.PIXEL_2x2,
+    utilities.MAX_PADDING_LEFT // utilities.PixelSize.PIXEL_4x4
+]]
 
 
 class BinarizedImageToPCodesTests(unittest.TestCase):
-    def test_single_pixel(self):
-        x_res = 1
-        y_res = 1
-
-        for pixel_size in [1, 2, 4]:
-            padding_left = utilities.MAX_PADDING_LEFT / pixel_size
-            binarized = [True]
-            p_codes = utilities.binarized_image_to_p_codes(binarized, x_res, y_res, padding_left)
-            expected_p_codes = [
-                [utilities.Command.PEN_RIGHT, padding_left],
-                [utilities.Command.PEN_DOWN, 1],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_UP, 1],
-                [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                [utilities.Command.PEN_RIGHT, padding_left],
-                [utilities.Command.SCROLL, 1]
-            ]
-            self.assertEqual(p_codes, expected_p_codes)
-
-            binarized = [False]
-            p_codes = utilities.binarized_image_to_p_codes(binarized, x_res, y_res, padding_left)
-            expected_p_codes = [
-                [utilities.Command.PEN_RIGHT, padding_left],
-                [utilities.Command.PEN_RIGHT, 0],
-                [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                [utilities.Command.PEN_RIGHT, padding_left],
-                [utilities.Command.SCROLL, 1]
-                ]
-            self.assertEqual(p_codes, expected_p_codes)
-
-    def test_2x1(self):
-        x_res = 2
-        y_res = 1
-
-        binarized_testcases = [
-            [True, True],
-            [True, False],
-            [False, True],
-            [False, False]
-        ]
-
-        for pixel_size in [1, 2, 4]:
-            padding_left = utilities.MAX_PADDING_LEFT / pixel_size
-            expected_p_codes = [
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1]
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1]
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1]
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1]
-                ]
-            ]
-
-            for images, expected in zip(binarized_testcases, expected_p_codes):
-                p_codes = utilities.binarized_image_to_p_codes(images, x_res, y_res, padding_left)
-                self.assertEqual(p_codes, expected)
-
-    def test_2x2(self):
-        x_res = 2
-        y_res = 2
-
-        binarized_testcases = [
-            [False, False,
-             False, False],
-
-            [False, False,
-             False, True],
-
-            [False, False,
-             True, False],
-
-            [False, False,
-             True, True],
-            # --------------------------------
-            [False, True,
-             False, False],
-
-            [False, True,
-             False, True],
-
-            [False, True,
-             True, False],
-
-            [False, True,
-             True, True],
-            # --------------------------------
-            [True, False,
-             False, False],
-
-            [True, False,
-             False, True],
-
-            [True, False,
-             True, False],
-
-            [True, False,
-             True, True],
-            # --------------------------------
-            [True, True,
-             False, False],
-
-            [True, True,
-             False, True],
-
-            [True, True,
-             True, False],
-
-            [True, True,
-             True, True]
-        ]
-
-        for pixel_size in [1, 2, 4]:
-            padding_left = utilities.MAX_PADDING_LEFT / pixel_size
-            expected_p_codes = [
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-                # ------------------------------------------------------------
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-                # ------------------------------------------------------------
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-                # ------------------------------------------------------------
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ],
-
-                [
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                ]
-            ]
-
-            for images, expected in zip(binarized_testcases, expected_p_codes):
-                p_codes = utilities.binarized_image_to_p_codes(images, x_res, y_res, padding_left)
-                self.assertEqual(p_codes, expected)
-
-    def test_10x10_alternating_rows(self):
-        x_res = 10
-        y_res = 10
-
-        binarized = [
-            (x // 10) % 2 == 0 for x in range(x_res * y_res)
-        ]
-
-        for pixel_size in [1, 2, 4]:
-            padding_left = utilities.MAX_PADDING_LEFT / pixel_size
-            expected_p_codes = [
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, x_res - 1],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-                    [utilities.Command.PEN_RIGHT, x_res - 1],
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1]
-            ] * (x_res // 2)
-
-            expected_p_codes = [[utilities.Command.PEN_RIGHT, padding_left]] + expected_p_codes
-            p_codes = utilities.binarized_image_to_p_codes(binarized, x_res, y_res, padding_left)
-            self.assertEqual(p_codes, expected_p_codes)
-
-    def test_10x10_alternating_cols(self):
-        x_res = 10
-        y_res = 10
-
-        binarized = [
-            x % 2 == 0 for x in range(x_res * y_res)  # works only for even x_res
-        ]
-
-        for pixel_size in [1, 2, 4]:
-            padding_left = utilities.MAX_PADDING_LEFT / pixel_size
-            expected_p_codes = [
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 2],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 2],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 2],
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 2],
-
-                    [utilities.Command.PEN_DOWN, 1],
-                    [utilities.Command.PEN_RIGHT, 0],
-                    [utilities.Command.PEN_UP, 1],
-                    [utilities.Command.PEN_RIGHT, 1],
-
-                    [utilities.Command.PEN_LEFT, x_res - 1 + padding_left],
-                    [utilities.Command.PEN_RIGHT, padding_left],
-                    [utilities.Command.SCROLL, 1],
-            ] * y_res
-
-            expected_p_codes = [[utilities.Command.PEN_RIGHT, padding_left]] + expected_p_codes
-            p_codes = utilities.binarized_image_to_p_codes(binarized, x_res, y_res, padding_left)
-            self.assertEqual(p_codes, expected_p_codes)
+    @parameterized.expand(list(chain(*test_binarized_image_to_p_codes_data)))
+    def test_binarized_image_to_p_codes(self, _, x_res, y_res, binarized, expected, padding):
+        self.assertEqual(expected, utilities.binarized_image_to_p_codes(binarized, x_res, y_res, padding))
 
 
 @parameterized_class(("image_path", "x_res", "y_res", "multicolor", "expected_img", "expected_x", "expected_y"), [
@@ -576,7 +507,7 @@ class GenerateAndBinarizeTestImage(unittest.TestCase):
         ("2x2", utilities.PixelSize.PIXEL_2x2, (140, 12)),
         ("3x3", utilities.PixelSize.PIXEL_4x4, (70, 12))
     ])
-    def test_generate_and_binarize_calibration_test_image(self, _, pixel_size, expected ):
+    def test_generate_and_binarize_calibration_test_image(self, _, pixel_size, expected):
         binarized, img_x, img_y = utilities.generate_and_binarize_calibration_test_image(pixel_size)
         expected_x_res, expected_y_res = expected
         self.assertEqual(expected_x_res * expected_y_res, len(binarized[0]))

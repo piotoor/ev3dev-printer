@@ -484,7 +484,8 @@ class BinarizeSingleColorImageTests(unittest.TestCase):
 ])
 class BinarizeMultiColorImageTests(unittest.TestCase):
     def test_binarize_image(self):
-        b, x, y = utilities.binarize_image(self.image_path, self.x_res, self.y_res, self.multicolor)
+        palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
+        b, x, y = utilities.binarize_image(self.image_path, self.x_res, self.y_res, self.multicolor, palette)
 
         for b, e in zip(b, self.expected_img):
             self.assertEqual(e, b)
@@ -900,7 +901,7 @@ class PaletteManagement(unittest.TestCase):
             self.assertEqual(utilities.rgb_to_the_closest_color_name(rgb), name)
 
     def test_read_palette_from_file(self):
-        palette = utilities.read_palette_from_file("test_palette2.txt")
+        palette = utilities.read_palette_from_file("test_palette.txt")
         expected_palette = (255, 255, 255, 0, 0, 0, 255, 0, 0, 7, 164, 65, 14, 2, 176, 255, 86, 193)
         self.assertEqual(palette, expected_palette)
 
